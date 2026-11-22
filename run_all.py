@@ -32,7 +32,7 @@ if __name__ == "__main__":
     rest += ["--out", known.out]
     t0 = time.time()
     py = sys.executable
-    run([py, os.path.join("tests", "test_correctness.py")])
+    run([py, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"])
     run([py, os.path.join("experiments", "run_experiments.py")] + rest)
     run([py, os.path.join("report", "build_report.py"), "--results", known.out, "--out", known.report])
     print(f"\nAll done in {time.time() - t0:.0f} s. Report: {os.path.relpath(known.report, ROOT)}; "

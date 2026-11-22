@@ -36,14 +36,21 @@ class Graph:
         self.edge_class[(u, v)] = cls
 
     def set_weight(self, u, v, w):
-        if w < 1:
-            raise ValueError("weights must be positive integers")
+        """Set the weight of edge (u, v). w = INF closes the road (the edge is
+        removed); a finite w on a missing edge (re)opens it."""
+        if w == INF:
+            self.out[u].pop(v, None)
+            self.inn[v].pop(u, None)
+            return
+        if w < 1 or w != int(w):
+            raise ValueError("weights must be positive integers (or INF to delete)")
         self.out[u][v] = w
         self.inn[v][u] = w
 
     # -- queries ------------------------------------------------------
     def weight(self, u, v):
-        return self.out[u][v]
+        """Current weight of (u, v); INF if the edge does not exist (closed)."""
+        return self.out[u].get(v, INF)
 
     def edges(self):
         return [(u, v, w) for u in range(self.n) for v, w in self.out[u].items()]

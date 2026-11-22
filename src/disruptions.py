@@ -1,16 +1,30 @@
 """Disruption simulators. Each returns a list of (u, v, old_w, new_w).
 
-A road 'closure' is modelled as a large finite weight multiplier (BLOCK_FACTOR)
-because the algorithms need finite positive integer weights.
+Two closure models are supported:
+  * "factor": a blocked road keeps a large finite weight (BLOCK_FACTOR x travel
+    time), so the network stays strongly connected;
+  * "delete": a blocked road is removed (new weight INF); nodes may become
+    unreachable from the source.
+Congestion waves only slow roads down and never delete them.
 """
 import math
 from collections import deque
 
-INF = float("inf")
+from graph import INF
 
-BLOCK_FACTOR = 50     # blocked road: 50x travel time
+BLOCK_FACTOR = 50     # blocked road ("factor" model): 50x travel time
 WAVE_PEAK = 10        # congestion multiplier at the epicentre
 WAVE_DECAY = 2.0      # hops over which congestion decays by 1/e
+CLOSURES = ("factor", "delete")
+
+
+def blocked(w, closure="factor"):
+    """New weight of a road with weight w after it is blocked."""
+    if closure == "delete":
+        return INF
+    if closure == "factor":
+        return w * BLOCK_FACTOR
+    raise ValueError(f"unknown closure model {closure!r}")
 
 
 def _bfs_edges(g, center, k):
@@ -31,21 +45,22 @@ def _bfs_edges(g, center, k):
     return found[:k]
 
 
-def single_block(g, rng, k=1):
+def single_block(g, rng, k=1, closure="factor"):
     """k independent random road closures scattered over the city."""
     edges = rng.sample(g.edges(), k)
-    return [(u, v, w, w * BLOCK_FACTOR) for u, v, w in edges]
+    return [(u, v, w, blocked(w, closure)) for u, v, w in edges]
 
 
-def cluster_block(g, rng, k):
+def cluster_block(g, rng, k, closure="factor"):
     """Accident zone: k connected edges around a random point are all blocked."""
     center = rng.randrange(g.n)
-    return [(u, v, g.out[u][v], g.out[u][v] * BLOCK_FACTOR)
+    return [(u, v, g.out[u][v], blocked(g.out[u][v], closure))
             for (u, v), _ in _bfs_edges(g, center, k)]
 
 
-def congestion_wave(g, rng, k):
-    """Congestion spreading from an epicentre: weight multiplier decays with hop distance."""
+def congestion_wave(g, rng, k, closure="factor"):
+    """Congestion spreading from an epicentre: weight multiplier decays with hop
+    distance. (`closure` is accepted for a uniform signature but unused.)"""
     center = rng.randrange(g.n)
     res = []
     for (u, v), depth in _bfs_edges(g, center, k):
@@ -55,29 +70,21 @@ def congestion_wave(g, rng, k):
     return res
 
 
-def spt_parents(g, s, dist):
-    """One shortest-path-tree parent per reachable node (-1 for s / unreachable),
-    derived from a correct distance array by picking any tight in-edge."""
-    parent = [-1] * g.n
-    for x in range(g.n):
-        if x == s or dist[x] == INF:
-            continue
-        for y, w in g.inn[x].items():
-            if dist[y] + w == dist[x]:
-                parent[x] = y
-                break
-    return parent
-
-
-def tree_block(g, rng, k, s, dist):
-    """k closures on random shortest-path-tree edges (worst-case-relevant: every
-    blocked road carries at least one shortest path from the source)."""
-    parent = spt_parents(g, s, dist)
+def tree_block(g, rng, k, parent, closure="factor"):
+    """k closures on random edges of the current shortest-path tree `parent`
+    (worst-case-relevant: every blocked road carries a shortest path)."""
     heads = [x for x in range(g.n) if parent[x] >= 0]
-    return [(parent[v], v, g.out[parent[v]][v], g.out[parent[v]][v] * BLOCK_FACTOR)
+    return [(parent[v], v, g.out[parent[v]][v], blocked(g.out[parent[v]][v], closure))
             for v in rng.sample(heads, min(k, len(heads)))]
 
 
 MODES = {"single": single_block, "cluster": cluster_block, "wave": congestion_wave,
          "tree": tree_block}
-TREE_MODES = {"tree"}   # generators that also need (s, dist)
+TREE_MODES = {"tree"}   # generators that also need the current shortest-path tree
+
+
+def generate(mode, g, rng, k, parent=None, closure="factor"):
+    """Uniform entry point: a disruption of `mode` with k edges."""
+    if mode in TREE_MODES:
+        return MODES[mode](g, rng, k, parent, closure)
+    return MODES[mode](g, rng, k, closure)

@@ -13,12 +13,12 @@ on Windows / Python 3.11. Commit after every phase, tests green each time.
 - [x] Measure `--quick` time and state it consistently
 
 ## Phase 2: algorithms
-- [ ] Parent array maintained by every repair path; `path_to(t)`
-- [ ] `update_edges(changes)` batch repair (one affected-set sweep + one Dijkstra), proof
-- [ ] True deletions (weight = inf) in `Graph.set_weight` and both repair paths; `--closure {factor,delete}`
-- [ ] Fleet experiment (K destinations: routes changed, minutes gained, stranded)
-- [ ] LPA* module + tests; point-to-point comparison vs A*/Dijkstra/repair
-- [ ] Sets vs generation-stamped arrays micro-benchmark; adopt only if faster
+- [x] Parent array maintained by every repair path; `path_to(t)`
+- [x] `update_edges(changes)` batch repair (one affected-set sweep + one Dijkstra), proof
+- [x] True deletions (weight = inf) in `Graph.set_weight` and both repair paths; `--closure {factor,delete}`
+- [x] Fleet experiment (K destinations: routes changed, minutes gained, stranded)
+- [x] LPA* module + tests; point-to-point comparison vs A*/Dijkstra/repair
+- [x] Sets vs generation-stamped arrays micro-benchmark; adopt only if faster
 
 ## Phase 3: real data
 - [ ] osmnx 1.x/2.x compatible loader; `--graph-file` for cached .graphml
