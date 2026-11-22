@@ -143,45 +143,50 @@ def make_synthetic_city(width=140, height=140, seed=0, remove_frac=0.08,
 
 
 # ---------------------------------------------------------------------
-# Real city via OSMnx
+# Real city (networkx / OSMnx graph -> Graph); downloading lives in osm.py
 # ---------------------------------------------------------------------
-def from_networkx(G, weight="travel_time", scale=10):
+ARTERIAL_TAGS = {"motorway", "trunk", "primary", "secondary",
+                 "motorway_link", "trunk_link", "primary_link", "secondary_link"}
+EARTH_RADIUS_M = 6_371_000.0
+
+
+def _first(value):
+    """OSM tags may be a list, or (in plain-networkx graphml) the string of a list."""
+    if isinstance(value, list):
+        return value[0] if value else ""
+    if isinstance(value, str) and value.startswith("["):
+        return value.strip("[]").split(",")[0].strip().strip("'\"")
+    return value
+
+
+def from_networkx(G, weight="travel_time", scale=10, lonlat=False):
     """Convert an OSMnx / networkx (Multi)DiGraph into our Graph.
-    `weight` is travel time in seconds; stored as integer deciseconds."""
+
+    `weight` is travel time in seconds (default speed 50 km/h if missing), stored
+    as integer deciseconds. With lonlat=True, node coordinates (x = longitude,
+    y = latitude) are projected to local metres (equirectangular around the mean
+    latitude), so distances, plots and the A*/LPA* heuristic are in metres."""
     nodes = list(G.nodes)
     index = {u: i for i, u in enumerate(nodes)}
-    xy = [(float(G.nodes[u].get("x", 0.0)), float(G.nodes[u].get("y", 0.0)))
-          for u in nodes]
-    arterial_tags = {"motorway", "trunk", "primary", "secondary",
-                     "motorway_link", "trunk_link", "primary_link", "secondary_link"}
+    xy = [(float(G.nodes[u].get("x", 0.0)), float(G.nodes[u].get("y", 0.0))) for u in nodes]
+    if lonlat and xy:
+        lat0 = math.radians(sum(p[1] for p in xy) / len(xy))
+        k = math.pi / 180 * EARTH_RADIUS_M
+        xy = [(lon * k * math.cos(lat0), lat * k) for lon, lat in xy]
     edge_list = []
     for u, v, data in G.edges(data=True):
         t = data.get(weight)
         if t is None:
             t = float(data.get("length", 100.0)) / (50 / 3.6)
-        hw = data.get("highway", "")
-        hw = hw[0] if isinstance(hw, list) and hw else hw
-        br = data.get("bridge", None)
-        br = br[0] if isinstance(br, list) and br else br
+        hw = _first(data.get("highway", ""))
+        br = _first(data.get("bridge", None))
         cls = "bridge" if (br and str(br).lower() not in ("no", "false", "nan")) \
-            else ("arterial" if hw in arterial_tags else "local")
+            else ("arterial" if hw in ARTERIAL_TAGS else "local")
         edge_list.append((index[u], index[v], max(1, round(float(t) * scale)), cls))
     return _largest_scc_graph(len(nodes), edge_list, xy)
 
 
 def load_osm(place, cache_dir="data"):
-    """Download (or load cached) drivable street network for a place name."""
-    import os
-    import re
-    import osmnx as ox
-    slug = re.sub(r"[^a-z0-9]+", "_", place.lower()).strip("_")
-    path = os.path.join(cache_dir, slug + ".graphml")
-    if os.path.exists(path):
-        G = ox.load_graphml(path)
-    else:
-        G = ox.graph_from_place(place, network_type="drive")
-        G = ox.add_edge_speeds(G)
-        G = ox.add_edge_travel_times(G)
-        os.makedirs(cache_dir, exist_ok=True)
-        ox.save_graphml(G, path)
-    return from_networkx(G)
+    """Backward-compatible alias for osm.load_osm (download or load cached city)."""
+    from osm import load_osm as _load
+    return _load(place, cache_dir)

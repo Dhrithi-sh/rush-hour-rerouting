@@ -21,7 +21,7 @@ on Windows / Python 3.11. Commit after every phase, tests green each time.
 - [x] Sets vs generation-stamped arrays micro-benchmark; adopt only if faster
 
 ## Phase 3: real data
-- [ ] osmnx 1.x/2.x compatible loader; `--graph-file` for cached .graphml
+- [x] osmnx 1.x/2.x compatible loader (`src/osm.py`), graph stats (`src/stats.py`), `scripts/fetch_cities.py`; `--graph-file` flag + cross-graph experiment NOT wired yet
 - [ ] Two real cities (grid-like US + irregular Indian/European), cross-graph figure, graph-stats table
 
 ## Phase 4: engineering

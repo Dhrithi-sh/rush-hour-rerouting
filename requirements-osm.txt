@@ -1,0 +1,3 @@
+# Optional: only needed to download real cities (--place, scripts/fetch_cities.py).
+# Cached .graphml files are read with plain networkx if osmnx is missing.
+osmnx>=1.6
