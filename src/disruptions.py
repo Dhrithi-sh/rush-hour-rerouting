@@ -6,6 +6,8 @@ because the algorithms need finite positive integer weights.
 import math
 from collections import deque
 
+INF = float("inf")
+
 BLOCK_FACTOR = 50     # blocked road: 50x travel time
 WAVE_PEAK = 10        # congestion multiplier at the epicentre
 WAVE_DECAY = 2.0      # hops over which congestion decays by 1/e
@@ -53,4 +55,29 @@ def congestion_wave(g, rng, k):
     return res
 
 
-MODES = {"single": single_block, "cluster": cluster_block, "wave": congestion_wave}
+def spt_parents(g, s, dist):
+    """One shortest-path-tree parent per reachable node (-1 for s / unreachable),
+    derived from a correct distance array by picking any tight in-edge."""
+    parent = [-1] * g.n
+    for x in range(g.n):
+        if x == s or dist[x] == INF:
+            continue
+        for y, w in g.inn[x].items():
+            if dist[y] + w == dist[x]:
+                parent[x] = y
+                break
+    return parent
+
+
+def tree_block(g, rng, k, s, dist):
+    """k closures on random shortest-path-tree edges (worst-case-relevant: every
+    blocked road carries at least one shortest path from the source)."""
+    parent = spt_parents(g, s, dist)
+    heads = [x for x in range(g.n) if parent[x] >= 0]
+    return [(parent[v], v, g.out[parent[v]][v], g.out[parent[v]][v] * BLOCK_FACTOR)
+            for v in rng.sample(heads, min(k, len(heads)))]
+
+
+MODES = {"single": single_block, "cluster": cluster_block, "wave": congestion_wave,
+         "tree": tree_block}
+TREE_MODES = {"tree"}   # generators that also need (s, dist)

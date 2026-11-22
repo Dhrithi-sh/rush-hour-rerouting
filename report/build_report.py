@@ -23,7 +23,8 @@ from docx.shared import Cm, Pt, RGBColor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODE_NAME = {"single": "scattered closures", "cluster": "accident zone",
-             "wave": "congestion wave"}
+             "wave": "congestion wave", "tree": "tree-edge closures"}
+RANDOM_MODES = ["single", "cluster", "wave"]     # random placement (may hit no shortest path)
 
 
 # ----------------------------------------------------------------- helpers
@@ -183,10 +184,14 @@ class Results:
         self.raw = pd.read_csv(os.path.join(folder, "raw_main.csv"))
         self.sizes = sorted(self.summ["size"].unique())
 
-    def row(self, mode, size, phase="block"):
+    def row(self, mode, size, phase="block", method="sequential"):
         r = self.summ[(self.summ["mode"] == mode) & (self.summ["size"] == size)
-                      & (self.summ["phase"] == phase)]
+                      & (self.summ["phase"] == phase) & (self.summ["method"] == method)]
         return r.iloc[0]
+
+    def xo(self, method="sequential", effective=False):
+        """Crossover (break-even) points per mode from meta.json; None = not reached."""
+        return self.meta["crossover"]["speedup_eff_med" if effective else "speedup_med"][method]
 
     def near(self, target):
         return min(self.sizes, key=lambda s: abs(np.log(s) - np.log(target)))
@@ -220,20 +225,28 @@ def build(R, out):
 
     # ---------- abstract
     D.h("Abstract", 1)
-    spm = {md: R.row(md, mid)["speedup_med"] for md in MODE_NAME}
-    spb = {md: R.row(md, big)["speedup_med"] for md in MODE_NAME}
-    xo = M["crossover"]
-    xo_txt = "; ".join(f"{MODE_NAME[md]} ≈ {xo[md]:.0f} edges" for md in MODE_NAME if xo.get(md))
+    modes = [md for md in MODE_NAME if md in set(R.summ["mode"])]
+    rmodes = [md for md in RANDOM_MODES if md in modes]
+    spm = {md: R.row(md, mid)["speedup_med"] for md in modes}
+    xo = R.xo()
+    noop1 = {md: R.row(md, lo)["frac_noop"] for md in rmodes}
+    tree1 = R.row("tree", lo)
+    xo_txt = "; ".join(f"{MODE_NAME[md]} ≈ {xo[md]:.0f} edges" for md in modes if xo.get(md))
     D.p(f"When accidents or congestion change travel times on a road network, a routing service must "
         f"update its shortest-path tree. The textbook response is to rerun Dijkstra’s algorithm from "
         f"scratch; an incremental alternative in the style of Ramalingam and Reps re-examines only the "
         f"nodes whose distance actually changes. We implement both, prove the repair algorithm correct "
         f"for positive integer weights, analyse its output-sensitive complexity, and benchmark it on a "
-        f"road graph with {n:,} nodes and {m:,} directed edges under three disruption models "
-        f"(scattered closures, an accident zone, and a spreading congestion wave). For disruptions of "
-        f"{mid} changed edges, repair was {x(min(spm.values()))}–{x(max(spm.values()))} faster than full "
-        f"recomputation (median over {M['trials']} trials), and still {x(min(spb.values()))}–{x(max(spb.values()))} "
-        f"faster at {big} edges. The advantage shrinks as the disruption grows"
+        f"road graph with {n:,} nodes and {m:,} directed edges under four disruption models "
+        f"(randomly placed scattered closures, an accident zone and a spreading congestion wave, plus "
+        f"closures restricted to shortest-path-tree edges). Random single-road closures are misleading: "
+        f"{100 * min(noop1.values()):.0f}–{100 * max(noop1.values()):.0f}% of them hit no shortest path, "
+        f"so repair returns after a constant-time check. We therefore report *effective* updates (at least "
+        f"one distance changes) separately. Blocking one shortest-path-tree edge, repair was "
+        f"{x(tree1['speedup_eff_med'])} faster than full recomputation (median over {M['trials']} trials, "
+        f"each timing itself the median of repeated runs); for {mid}-edge disruptions the speed-up was "
+        f"{x(min(spm.values()))}–{x(max(spm.values()))} across models. The advantage shrinks as the "
+        f"disruption grows"
         + (f"; estimated break-even points, beyond which recomputing is cheaper, are {xo_txt}."
            if xo_txt else "; within the tested range repair never became slower than recomputation.")
         + f" Every repaired result was checked against a fresh Dijkstra run "
@@ -318,6 +331,9 @@ INCREASE(u, v, w_old, w_new):               // weight already updated in G
                "**Accident zone:** k connected edges around a random point (BFS order) are blocked (× 50).",
                "**Congestion wave:** k connected edges around a random epicentre are slowed by a factor "
                "1 + 9·e^(−h/2), where h is the hop distance from the epicentre, so the effect fades with distance.",
+               "**Tree-edge closures:** k edges of the current shortest-path tree are blocked (× 50). Every "
+               "such road carries at least one shortest path, so these updates are almost never no-ops; "
+               "this is the worst-case-relevant curve for random closures.",
                "Every disruption is followed by a **clearing phase** that restores the original weights "
                "(weight decreases), so both repair cases are measured."])
     D.h("2.5 Implementation", 2)
@@ -429,7 +445,13 @@ INCREASE(u, v, w_old, w_new):               // weight already updated in G
         f"{M['trials']} independent trials with random disruption locations. In each trial we (1) applied the disruption "
         f"with incremental repair and timed it, (2) timed a full Dijkstra run on the resulting graph, "
         f"(3) asserted that both distance arrays are identical, then repeated this for the clearing phase. "
-        f"We report medians (and inter-quartile ranges) of the per-trial speed-up t_Dijkstra / t_repair. "
+        f"Short operations are noisy, so every timing is repeated: repair runs until it has accumulated "
+        f"at least {1e3 * M['timing']['min_total_s']:.0f} ms ({M['timing']['min_reps']}–{M['timing']['max_reps']} "
+        f"runs), Dijkstra {M['timing']['full_reps']} times, and the per-trial time is the median of those runs. "
+        f"Between repeats the graph and the distance array are restored to the exact pre-disruption state "
+        f"(asserted). We report medians and inter-quartile ranges (IQR) over trials of the per-trial speed-up "
+        f"t_Dijkstra / t_repair, both over *all* trials and over *effective* trials only (at least one distance "
+        f"changed), together with the fraction of no-op trials. "
         f"Garbage collection was disabled during timing. Python {M['python']} on a single core.")
     D.note("**Reading the numbers.** Absolute times come from a pure-Python implementation and will differ in "
            "C++ or Rust; the *ratios* and the shape of the curves are what matters. Timings of sub-millisecond "
@@ -437,47 +459,67 @@ INCREASE(u, v, w_old, w_new):               // weight already updated in G
 
     D.h("5.2 Speed-up versus disruption size (RQ1, RQ2)", 2)
     sizes_show = sorted({lo, R.near(5), mid, R.near(50), big, hi})
-    rows = []
-    for k in sizes_show:
-        r = [k]
-        for md in MODE_NAME:
-            rr = R.row(md, k)
-            r.append(f"{x(rr['speedup_med'])}  ({ms(rr['t_repair_ms'])} vs {ms(rr['t_full_ms'])})")
-        rows.append(r)
-    D.table(["Edges changed"] + [MODE_NAME[md].capitalize() for md in MODE_NAME], rows,
-            caption="Median speed-up of repair over full Dijkstra when blocking roads "
-                    "(median repair time vs. median Dijkstra time in brackets).",
-            widths=[2.6, 4.5, 4.5, 4.5])
-    r0 = R.raw[(R.raw["mode"] == "single") & (R.raw["size"] == lo) & (R.raw["phase"] == "block")]
-    noop = float((r0["net_changed"] == 0).mean())
-    D.p(f"**Caveat on tiny disruptions.** In {100 * noop:.0f}% of the {len(r0)} single-edge trials the blocked road was not "
-        f"on the shortest-path tree, so no distance changed and repair correctly did no work (this costs a few "
-        f"microseconds). The median speed-up at size {lo} is therefore dominated by these no-op cases; the scaling "
-        f"and ripple experiments below deliberately block tree edges to measure the cases that matter.")
+
+    def cell(rr):
+        eff = rr["speedup_eff_med"]
+        e = "–" if pd.isna(eff) else x(eff)
+        return f"{x(rr['speedup_med'])} / {e}  ({100 * rr['frac_noop']:.0f}%)"
+
+    rows = [[k] + [cell(R.row(md, k)) for md in modes] for k in sizes_show]
+    D.table(["Edges changed"] + [MODE_NAME[md].capitalize() for md in modes], rows,
+            caption="Median speed-up of repair over full Dijkstra when blocking roads: all trials / "
+                    "effective trials only (percentage of no-op trials in brackets; “–” = no effective trial).",
+            widths=[2.4] + [3.6] * len(modes), size=8.5)
+    eff_from = next((k for k in R.sizes
+                     if all(R.row(md, k)["frac_noop"] < 0.05 for md in rmodes)), None)
+    D.p("**Effective versus no-op updates.** At size "
+        + f"{lo}, " + ", ".join(f"{100 * noop1[md]:.0f}% of the trials with {MODE_NAME[md]}" for md in rmodes)
+        + " changed no distance at all: the blocked road was not on any shortest path, so repair "
+        "correctly stopped after one comparison. Such trials take microseconds and inflate the median "
+        "speed-up enormously (median speed-up of the no-op trials alone: "
+        + ", ".join(f"{x(R.row(md, lo)['speedup_noop_med'])} for {MODE_NAME[md]}" for md in rmodes
+                    if not pd.isna(R.row(md, lo)["speedup_noop_med"]))
+        + "). "
+        + (f"The no-op fraction drops quickly with size (Table 1): from {eff_from} edges on, fewer than 5% of "
+           "the trials of every random model are no-ops and the two numbers agree. " if eff_from else
+           "Even at the largest tested size some random trials were no-ops (Table 1). ")
+        + "The *tree-edge closures* avoid the problem by "
+        f"construction (no-op fraction at size {lo}: {100 * tree1['frac_noop']:.0f}%); they are the honest "
+        "curve for “a road that matters is blocked”.")
     D.figure(R.path("fig1_speedup_vs_size.png"),
-             "Median speed-up (bands: inter-quartile range, blocking phase) versus disruption size. "
-             "Values above the black line mean repair is faster.")
+             "Median speed-up versus disruption size, one panel per disruption model (blocking phase). "
+             "Solid: all trials (band = IQR); dotted: effective trials only. Above the black line repair is faster.")
     parts = []
-    for md in MODE_NAME:
+    for md in modes:
         a, b, c = R.row(md, lo)["speedup_med"], R.row(md, big)["speedup_med"], R.row(md, hi)["speedup_med"]
         parts.append(f"for the {MODE_NAME[md]} {x(a)} at {lo} edge{'s' if lo > 1 else ''}, {x(b)} at {big} edges and "
                      f"{x(c)} at {hi} edges")
     D.p("The speed-up falls steadily as more edges change: " + "; ".join(parts) + ".")
+    xo_eff = R.xo(effective=True)
     xo_lines = []
-    for md in MODE_NAME:
+    for md in modes:
         if xo.get(md):
-            xo_lines.append(f"{MODE_NAME[md]}: ≈ {xo[md]:.0f} edges")
+            ef = xo_eff.get(md)
+            xo_lines.append(f"{MODE_NAME[md]}: ≈ {xo[md]:.0f} edges"
+                            + (f" (effective trials only: ≈ {ef:.0f})" if ef and abs(ef - xo[md]) > 0.5 else ""))
         else:
             xo_lines.append(f"{MODE_NAME[md]}: no break-even within the tested range (up to {hi} edges)")
     D.p("**Break-even point (RQ2).** Interpolating on the log–log curve, the median speed-up crosses 1 at: "
-        + "; ".join(xo_lines) + ". Beyond that point it is cheaper to recompute from scratch. "
-        "In practice a system could switch strategy based on the number of changed edges, or on a running "
-        "estimate of Σ|δ|.")
+        + "; ".join(xo_lines) + ". "
+        + ("Counting only effective trials leaves these break-even points unchanged, because no-op trials "
+           "have disappeared long before the break-even sizes. "
+           if all(xo.get(md) == xo_eff.get(md) for md in modes) else
+           "Where a value in brackets is shown, excluding no-op trials moves the break-even point. ")
+        + ("Tree-edge closures break even much earlier, since every closed edge forces real work. "
+           if xo.get("tree") and all(xo["tree"] < (xo.get(md) or 1e18) for md in rmodes) else "")
+        + "Beyond the break-even point it is cheaper to "
+        "recompute from scratch; a system could switch strategy based on the number of changed edges, or on "
+        "a running estimate of Σ|δ|.")
     cl_hi = R.row("cluster", hi, "clear")["speedup_med"]
     bl_hi = R.row("cluster", hi, "block")["speedup_med"]
     faster = sum(R.row(md, k, "clear")["speedup_med"] > R.row(md, k, "block")["speedup_med"]
-                 for md in MODE_NAME for k in R.sizes)
-    total = len(MODE_NAME) * len(R.sizes)
+                 for md in modes for k in R.sizes)
+    total = len(modes) * len(R.sizes)
     if faster >= 0.6 * total:
         D.p(f"The **clearing phase** (dashed lines) shows a higher speed-up than the blocking phase in {faster} of "
             f"{total} settings (accident zone at {hi} edges: {x(cl_hi)} vs {x(bl_hi)}). This is plausible because weight "
@@ -487,7 +529,8 @@ INCREASE(u, v, w_old, w_new):               // weight already updated in G
         D.p(f"The **clearing phase** (dashed lines) did not show a consistent advantage over the blocking phase "
             f"(higher speed-up in {faster} of {total} settings; accident zone at {hi} edges: {x(cl_hi)} vs {x(bl_hi)}).")
     D.figure(R.path("fig2_runtime_vs_size.png"),
-             "Absolute median time per disruption. Dijkstra’s cost is flat; repair cost grows with the size of the disruption.")
+             "Median time per disruption (bands = IQR over trials). Dijkstra’s cost is flat; repair cost grows "
+             "with the size of the disruption. Dotted: effective trials only.")
     D.figure(R.path("fig3_affected_fraction.png"),
              "Mean percentage of nodes whose shortest-path distance changes. Repair work is proportional to this quantity.", 12.5)
 
@@ -552,9 +595,12 @@ INCREASE(u, v, w_old, w_new):               // weight already updated in G
 
     # ---------- 6 conclusion
     D.h("6. Conclusion", 1)
-    D.p(f"Incremental shortest-path repair is a clear win when only a few roads change: on a {n:,}-node map "
-        f"it was {x(min(spm.values()))}–{x(max(spm.values()))} faster than rerunning Dijkstra for disruptions of "
-        f"{mid} edges and {x(min(spb.values()))}–{x(max(spb.values()))} faster at {big} edges. "
+    D.p(f"Incremental shortest-path repair is a clear win when only a few roads change: on a {n:,}-node map, "
+        f"blocking a single road that carries shortest paths was repaired {x(tree1['speedup_eff_med'])} faster "
+        f"than rerunning Dijkstra, and disruptions of {mid} edges {x(min(spm.values()))}–{x(max(spm.values()))} faster. "
+        f"Headline speed-ups for random single closures (up to {x(max(R.row(md, lo)['speedup_med'] for md in rmodes))}) "
+        f"mostly measure the early exit for roads that no shortest path uses, so they should not be quoted "
+        f"without the no-op fraction. "
         f"Its cost is governed by how many distances actually change rather than by the size of the map, and "
         f"the advantage grows with the map. "
         + (f"The benefit disappears once a disruption touches on the order of "

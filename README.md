@@ -26,7 +26,7 @@ This runs, in order: correctness tests → experiments (CSVs + 6 figures in `res
 
 | Command | What it does | Time |
 |---|---|---|
-| `python run_all.py --quick` | small graph, few trials (smoke test) | ~15 s |
+| `python run_all.py --quick` | small graph, few trials (smoke test) | ~20 s (measured 17 s) |
 | `python run_all.py` | full run on the synthetic city (~20k nodes, 15 trials) | ~2 min |
 | `python run_all.py --place "Piedmont, California, USA"` | **real OpenStreetMap city** | depends on city |
 
