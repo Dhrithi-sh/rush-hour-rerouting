@@ -1,10 +1,39 @@
 {
+  "git_commit": "ed9877f74648e9a753436600d197bde439005683",
+  "git_dirty": false,
+  "command": "python experiments/run_experiments.py --out results",
+  "args": {
+    "place": null,
+    "graph_file": null,
+    "compare_graphs": null,
+    "width": 140,
+    "height": 140,
+    "seed": 0,
+    "trials": 15,
+    "sizes": [
+      1,
+      2,
+      5,
+      10,
+      20,
+      50,
+      100,
+      200,
+      500,
+      1000,
+      2000
+    ],
+    "closure": "factor",
+    "fleet_size": 50,
+    "quick": false,
+    "out": "results"
+  },
   "graph_source": "Synthetic city (140x140 perturbed grid, arterials, one-way streets, river with 4 bridges)",
   "n": 19580,
   "m": 67980,
   "depot": 9858,
   "seed": 0,
-  "trials": 30,
+  "trials": 15,
   "sizes": [
     1,
     2,
@@ -18,17 +47,104 @@
     1000,
     2000
   ],
+  "modes": [
+    "single",
+    "cluster",
+    "wave",
+    "tree"
+  ],
+  "methods": [
+    "sequential",
+    "batch"
+  ],
+  "closure": "factor",
   "block_factor": 50,
-  "equality_checks_passed": 3188,
-  "crossover": {
-    "single": 460.93039627178877,
-    "cluster": 1655.2464304504444,
-    "wave": 1722.8822752141407
+  "fleet_size": 50,
+  "timing": {
+    "min_total_s": 0.002,
+    "min_reps": 3,
+    "max_reps": 50,
+    "full_reps": 3
   },
-  "python": "3.12.3",
-  "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39",
-  "runtime_seconds": 156.7,
+  "equality_checks_passed": 136601,
+  "crossover": {
+    "speedup_med": {
+      "sequential": {
+        "single": 405.4786197952628,
+        "cluster": 1547.6271265893588,
+        "wave": 1480.1952850411785,
+        "tree": 139.50945418809997
+      },
+      "batch": {
+        "single": 399.80049960220003,
+        "cluster": null,
+        "wave": null,
+        "tree": 143.39711168124583
+      }
+    },
+    "speedup_eff_med": {
+      "sequential": {
+        "single": 405.4786197952628,
+        "cluster": 1547.6271265893588,
+        "wave": 1480.1952850411785,
+        "tree": 139.50945418809997
+      },
+      "batch": {
+        "single": 399.80049960220003,
+        "cluster": null,
+        "wave": null,
+        "tree": 143.39711168124583
+      }
+    }
+  },
+  "marks": {
+    "n": 300,
+    "median_us_sets": 8.900002285372466,
+    "median_us_arrays": 8.449995220871642,
+    "total_ms_sets": 66.77915004547685,
+    "total_ms_arrays": 61.96089991135523,
+    "n_big": 31,
+    "big_threshold": 50,
+    "total_ms_sets_big": 62.75995000760304,
+    "total_ms_arrays_big": 58.08119995344896
+  },
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "runtime_seconds": 410.3,
+  "crossgraph": {
+    "synthetic": {
+      "sequential": {
+        "tree": 138.64390030378874,
+        "cluster": 1439.2621040150718
+      },
+      "batch": {
+        "tree": 159.22018913211568,
+        "cluster": null
+      }
+    },
+    "bologna_italy": {
+      "sequential": {
+        "tree": 54.25062215671523,
+        "cluster": 300.6989582975658
+      },
+      "batch": {
+        "tree": 59.11709358138203,
+        "cluster": 904.5613318396112
+      }
+    },
+    "salt_lake_city_utah_usa": {
+      "sequential": {
+        "tree": 84.52209368008091,
+        "cluster": 442.24543830187247
+      },
+      "batch": {
+        "tree": 102.15405254426706,
+        "cluster": 1397.276999238791
+      }
+    }
+  },
   "heatmap_net_changed": 2419,
+  "heatmap_stranded": 0,
   "ripple": {
     "n": 304,
     "max_affected": 4790,

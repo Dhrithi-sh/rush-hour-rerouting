@@ -1,0 +1,451 @@
+pair,target,scenario,phase,method,time,lpa_expansions,route_hops
+0,10498,1 road on the route,block,full Dijkstra,0.015847399990889244,1988,98
+0,10498,1 road on the route,block,Dijkstra to t,0.016138600010890514,1988,98
+0,10498,1 road on the route,block,A*,0.004373200004920363,1988,98
+0,10498,1 road on the route,block,batch repair,0.001284000012674369,1988,98
+0,10498,1 road on the route,block,LPA*,0.009008799999719486,1988,98
+0,10498,1 road on the route,clear,full Dijkstra,0.016067800010205247,237,98
+0,10498,1 road on the route,clear,Dijkstra to t,0.014035600004717708,237,98
+0,10498,1 road on the route,clear,A*,0.002689100001589395,237,98
+0,10498,1 road on the route,clear,batch repair,0.0005144000024301931,237,98
+0,10498,1 road on the route,clear,LPA*,0.0009571999980835244,237,98
+0,10498,3 roads on the route,block,full Dijkstra,0.013821799992001615,321,98
+0,10498,3 roads on the route,block,Dijkstra to t,0.016714500001398847,321,98
+0,10498,3 roads on the route,block,A*,0.004148400010308251,321,98
+0,10498,3 roads on the route,block,batch repair,0.0005291999987093732,321,98
+0,10498,3 roads on the route,block,LPA*,0.0014201000012690201,321,98
+0,10498,3 roads on the route,clear,full Dijkstra,0.013571900009992532,65,98
+0,10498,3 roads on the route,clear,Dijkstra to t,0.01398190000327304,65,98
+0,10498,3 roads on the route,clear,A*,0.0028485000075306743,65,98
+0,10498,3 roads on the route,clear,batch repair,0.00020570000197039917,65,98
+0,10498,3 roads on the route,clear,LPA*,0.00025969999842345715,65,98
+0,10498,20-edge zone on the route,block,full Dijkstra,0.013775200000964105,82,98
+0,10498,20-edge zone on the route,block,Dijkstra to t,0.014140799990855157,82,98
+0,10498,20-edge zone on the route,block,A*,0.0038598000101046637,82,98
+0,10498,20-edge zone on the route,block,batch repair,0.0005048000093665905,82,98
+0,10498,20-edge zone on the route,block,LPA*,0.0003983000060543418,82,98
+0,10498,20-edge zone on the route,clear,full Dijkstra,0.016166000001248904,39,98
+0,10498,20-edge zone on the route,clear,Dijkstra to t,0.012891799997305498,39,98
+0,10498,20-edge zone on the route,clear,A*,0.0026450000004842877,39,98
+0,10498,20-edge zone on the route,clear,batch repair,0.0001838000025600195,39,98
+0,10498,20-edge zone on the route,clear,LPA*,0.00015875000099185854,39,98
+1,18723,1 road on the route,block,full Dijkstra,0.016020900002331473,879,116
+1,18723,1 road on the route,block,Dijkstra to t,0.014023099996848032,879,116
+1,18723,1 road on the route,block,A*,0.003120699999271892,879,116
+1,18723,1 road on the route,block,batch repair,0.0017115000082412735,879,116
+1,18723,1 road on the route,block,LPA*,0.004248199998983182,879,116
+1,18723,1 road on the route,clear,full Dijkstra,0.013929900000221096,417,116
+1,18723,1 road on the route,clear,Dijkstra to t,0.013919500008341856,417,116
+1,18723,1 road on the route,clear,A*,0.0032546000002184883,417,116
+1,18723,1 road on the route,clear,batch repair,0.0006416999967768788,417,116
+1,18723,1 road on the route,clear,LPA*,0.0016082000074675307,417,116
+1,18723,3 roads on the route,block,full Dijkstra,0.013823100001900457,2226,116
+1,18723,3 roads on the route,block,Dijkstra to t,0.01473450000048615,2226,116
+1,18723,3 roads on the route,block,A*,0.0032432000007247552,2226,116
+1,18723,3 roads on the route,block,batch repair,0.002934200005256571,2226,116
+1,18723,3 roads on the route,block,LPA*,0.010281899987603538,2226,116
+1,18723,3 roads on the route,clear,full Dijkstra,0.016883299991604872,1091,116
+1,18723,3 roads on the route,clear,Dijkstra to t,0.01734489999944344,1091,116
+1,18723,3 roads on the route,clear,A*,0.0041453000012552366,1091,116
+1,18723,3 roads on the route,clear,batch repair,0.0013183999981265515,1091,116
+1,18723,3 roads on the route,clear,LPA*,0.00480260000040289,1091,116
+1,18723,20-edge zone on the route,block,full Dijkstra,0.020394899998791516,1717,116
+1,18723,20-edge zone on the route,block,Dijkstra to t,0.017620299986447208,1717,116
+1,18723,20-edge zone on the route,block,A*,0.00454629999876488,1717,116
+1,18723,20-edge zone on the route,block,batch repair,0.002726000006077811,1717,116
+1,18723,20-edge zone on the route,block,LPA*,0.008150599998771213,1717,116
+1,18723,20-edge zone on the route,clear,full Dijkstra,0.016957999992882833,860,116
+1,18723,20-edge zone on the route,clear,Dijkstra to t,0.01695419999305159,860,116
+1,18723,20-edge zone on the route,clear,A*,0.003414100006921217,860,116
+1,18723,20-edge zone on the route,clear,batch repair,0.0009388999897055328,860,116
+1,18723,20-edge zone on the route,clear,LPA*,0.003270800007157959,860,116
+2,8112,1 road on the route,block,full Dijkstra,0.01578999999037478,339,106
+2,8112,1 road on the route,block,Dijkstra to t,0.01522869999462273,339,106
+2,8112,1 road on the route,block,A*,0.0020388999982969835,339,106
+2,8112,1 road on the route,block,batch repair,0.0008878999942680821,339,106
+2,8112,1 road on the route,block,LPA*,0.0016011999978218228,339,106
+2,8112,1 road on the route,clear,full Dijkstra,0.016775800002506003,160,106
+2,8112,1 road on the route,clear,Dijkstra to t,0.015715500005171634,160,106
+2,8112,1 road on the route,clear,A*,0.002008600000408478,160,106
+2,8112,1 road on the route,clear,batch repair,0.0002865999995265156,160,106
+2,8112,1 road on the route,clear,LPA*,0.0006199000054039061,160,106
+2,8112,3 roads on the route,block,full Dijkstra,0.01711250000516884,3055,106
+2,8112,3 roads on the route,block,Dijkstra to t,0.016161499996087514,3055,106
+2,8112,3 roads on the route,block,A*,0.0022836999996798113,3055,106
+2,8112,3 roads on the route,block,batch repair,0.011933700006920844,3055,106
+2,8112,3 roads on the route,block,LPA*,0.01636779999535065,3055,106
+2,8112,3 roads on the route,clear,full Dijkstra,0.015384500002255663,1498,106
+2,8112,3 roads on the route,clear,Dijkstra to t,0.015420399999129586,1498,106
+2,8112,3 roads on the route,clear,A*,0.001997799990931526,1498,106
+2,8112,3 roads on the route,clear,batch repair,0.005254999996395782,1498,106
+2,8112,3 roads on the route,clear,LPA*,0.0064181000052485615,1498,106
+2,8112,20-edge zone on the route,block,full Dijkstra,0.016279000003123656,518,106
+2,8112,20-edge zone on the route,block,Dijkstra to t,0.014348500000778586,518,106
+2,8112,20-edge zone on the route,block,A*,0.002732799999648705,518,106
+2,8112,20-edge zone on the route,block,batch repair,0.00024819999816827476,518,106
+2,8112,20-edge zone on the route,block,LPA*,0.002157199996872805,518,106
+2,8112,20-edge zone on the route,clear,full Dijkstra,0.013925000006565824,28,106
+2,8112,20-edge zone on the route,clear,Dijkstra to t,0.013796500003081746,28,106
+2,8112,20-edge zone on the route,clear,A*,0.0019786999910138547,28,106
+2,8112,20-edge zone on the route,clear,batch repair,0.0001019000046653673,28,106
+2,8112,20-edge zone on the route,clear,LPA*,0.00012650000280700624,28,106
+3,5048,1 road on the route,block,full Dijkstra,0.013606799999251962,502,92
+3,5048,1 road on the route,block,Dijkstra to t,0.011367099999915808,502,92
+3,5048,1 road on the route,block,A*,0.0014258000010158867,502,92
+3,5048,1 road on the route,block,batch repair,0.0007231999916257337,502,92
+3,5048,1 road on the route,block,LPA*,0.00197130000742618,502,92
+3,5048,1 road on the route,clear,full Dijkstra,0.014986199996201321,1,92
+3,5048,1 road on the route,clear,Dijkstra to t,0.010713800002122298,1,92
+3,5048,1 road on the route,clear,A*,0.001018900002236478,1,92
+3,5048,1 road on the route,clear,batch repair,0.00021260000357870013,1,92
+3,5048,1 road on the route,clear,LPA*,6.100002792663872e-06,1,92
+3,5048,3 roads on the route,block,full Dijkstra,0.014977300001191907,3237,92
+3,5048,3 roads on the route,block,Dijkstra to t,0.01605790000758134,3237,92
+3,5048,3 roads on the route,block,A*,0.002019000006839633,3237,92
+3,5048,3 roads on the route,block,batch repair,0.02586929999233689,3237,92
+3,5048,3 roads on the route,block,LPA*,0.018769499991321936,3237,92
+3,5048,3 roads on the route,clear,full Dijkstra,0.016403300003730692,970,92
+3,5048,3 roads on the route,clear,Dijkstra to t,0.021283799986122176,970,92
+3,5048,3 roads on the route,clear,A*,0.0019664999999804422,970,92
+3,5048,3 roads on the route,clear,batch repair,0.014787199994316325,970,92
+3,5048,3 roads on the route,clear,LPA*,0.0042963999876519665,970,92
+3,5048,20-edge zone on the route,block,full Dijkstra,0.016871600004378706,71,92
+3,5048,20-edge zone on the route,block,Dijkstra to t,0.011478499989607371,71,92
+3,5048,20-edge zone on the route,block,A*,0.0011478000087663531,71,92
+3,5048,20-edge zone on the route,block,batch repair,0.002860099993995391,71,92
+3,5048,20-edge zone on the route,block,LPA*,0.00038270000368356705,71,92
+3,5048,20-edge zone on the route,clear,full Dijkstra,0.015764399999170564,26,92
+3,5048,20-edge zone on the route,clear,Dijkstra to t,0.011428300000261515,26,92
+3,5048,20-edge zone on the route,clear,A*,0.001117099993280135,26,92
+3,5048,20-edge zone on the route,clear,batch repair,0.0011279999889666215,26,92
+3,5048,20-edge zone on the route,clear,LPA*,0.00012080000306013972,26,92
+4,3245,1 road on the route,block,full Dijkstra,0.015148100006626919,2337,90
+4,3245,1 road on the route,block,Dijkstra to t,0.012070099997799844,2337,90
+4,3245,1 road on the route,block,A*,0.0019308000046294183,2337,90
+4,3245,1 road on the route,block,batch repair,0.009018100012326613,2337,90
+4,3245,1 road on the route,block,LPA*,0.011508199997479096,2337,90
+4,3245,1 road on the route,clear,full Dijkstra,0.015097699986654334,935,90
+4,3245,1 road on the route,clear,Dijkstra to t,0.01182840000547003,935,90
+4,3245,1 road on the route,clear,A*,0.0016926999960560352,935,90
+4,3245,1 road on the route,clear,batch repair,0.0033838999952422455,935,90
+4,3245,1 road on the route,clear,LPA*,0.003542199992807582,935,90
+4,3245,3 roads on the route,block,full Dijkstra,0.015361099998699501,1855,90
+4,3245,3 roads on the route,block,Dijkstra to t,0.011986400000751019,1855,90
+4,3245,3 roads on the route,block,A*,0.0017580999992787838,1855,90
+4,3245,3 roads on the route,block,batch repair,0.009124799995333888,1855,90
+4,3245,3 roads on the route,block,LPA*,0.010478500000317581,1855,90
+4,3245,3 roads on the route,clear,full Dijkstra,0.016756600001826882,929,90
+4,3245,3 roads on the route,clear,Dijkstra to t,0.013554300006944686,929,90
+4,3245,3 roads on the route,clear,A*,0.0018906999903265387,929,90
+4,3245,3 roads on the route,clear,batch repair,0.0036729999992530793,929,90
+4,3245,3 roads on the route,clear,LPA*,0.004619100000127219,929,90
+4,3245,20-edge zone on the route,block,full Dijkstra,0.017309600007138215,241,90
+4,3245,20-edge zone on the route,block,Dijkstra to t,0.01270239999576006,241,90
+4,3245,20-edge zone on the route,block,A*,0.001561299999593757,241,90
+4,3245,20-edge zone on the route,block,batch repair,0.003232000002753921,241,90
+4,3245,20-edge zone on the route,block,LPA*,0.0012076999992132187,241,90
+4,3245,20-edge zone on the route,clear,full Dijkstra,0.017393699992680922,132,90
+4,3245,20-edge zone on the route,clear,Dijkstra to t,0.012465799998608418,132,90
+4,3245,20-edge zone on the route,clear,A*,0.0016417000006185845,132,90
+4,3245,20-edge zone on the route,clear,batch repair,0.0009679999930085614,132,90
+4,3245,20-edge zone on the route,clear,LPA*,0.0005633999971905723,132,90
+5,16803,1 road on the route,block,full Dijkstra,0.016907600002014078,725,106
+5,16803,1 road on the route,block,Dijkstra to t,0.016961200002697296,725,106
+5,16803,1 road on the route,block,A*,0.0027251999999862164,725,106
+5,16803,1 road on the route,block,batch repair,0.0033675000013317913,725,106
+5,16803,1 road on the route,block,LPA*,0.003592599998228252,725,106
+5,16803,1 road on the route,clear,full Dijkstra,0.01683979999506846,235,106
+5,16803,1 road on the route,clear,Dijkstra to t,0.014675200000056066,235,106
+5,16803,1 road on the route,clear,A*,0.0018566999933682382,235,106
+5,16803,1 road on the route,clear,batch repair,0.0013999999937368557,235,106
+5,16803,1 road on the route,clear,LPA*,0.0009083999902941287,235,106
+5,16803,3 roads on the route,block,full Dijkstra,0.01557469999534078,4181,106
+5,16803,3 roads on the route,block,Dijkstra to t,0.01592059999529738,4181,106
+5,16803,3 roads on the route,block,A*,0.002279899999848567,4181,106
+5,16803,3 roads on the route,block,batch repair,0.013246100003016181,4181,106
+5,16803,3 roads on the route,block,LPA*,0.022805300002801232,4181,106
+5,16803,3 roads on the route,clear,full Dijkstra,0.015749600002891384,1781,106
+5,16803,3 roads on the route,clear,Dijkstra to t,0.014257700007874519,1781,106
+5,16803,3 roads on the route,clear,A*,0.0019207000004826114,1781,106
+5,16803,3 roads on the route,clear,batch repair,0.005669899997883476,1781,106
+5,16803,3 roads on the route,clear,LPA*,0.007209600007627159,1781,106
+5,16803,20-edge zone on the route,block,full Dijkstra,0.0163200999959372,455,106
+5,16803,20-edge zone on the route,block,Dijkstra to t,0.01566629999433644,455,106
+5,16803,20-edge zone on the route,block,A*,0.0022926999954506755,455,106
+5,16803,20-edge zone on the route,block,batch repair,0.0006127000087872148,455,106
+5,16803,20-edge zone on the route,block,LPA*,0.001975699997274205,455,106
+5,16803,20-edge zone on the route,clear,full Dijkstra,0.01635460001125466,8,106
+5,16803,20-edge zone on the route,clear,Dijkstra to t,0.015718700000434183,8,106
+5,16803,20-edge zone on the route,clear,A*,0.0019237000087741762,8,106
+5,16803,20-edge zone on the route,clear,batch repair,0.0003060999879380688,8,106
+5,16803,20-edge zone on the route,clear,LPA*,5.099999543745071e-05,8,106
+6,6311,1 road on the route,block,full Dijkstra,0.015795600003912114,1096,79
+6,6311,1 road on the route,block,Dijkstra to t,0.009688999998616055,1096,79
+6,6311,1 road on the route,block,A*,0.0007471999997505918,1096,79
+6,6311,1 road on the route,block,batch repair,0.01446849999774713,1096,79
+6,6311,1 road on the route,block,LPA*,0.005773200013209134,1096,79
+6,6311,1 road on the route,clear,full Dijkstra,0.01564330000837799,501,79
+6,6311,1 road on the route,clear,Dijkstra to t,0.009606799998437054,501,79
+6,6311,1 road on the route,clear,A*,0.0006736000068485737,501,79
+6,6311,1 road on the route,clear,batch repair,0.005047999991802499,501,79
+6,6311,1 road on the route,clear,LPA*,0.0021065000037197024,501,79
+6,6311,3 roads on the route,block,full Dijkstra,0.0147514999989653,1625,79
+6,6311,3 roads on the route,block,Dijkstra to t,0.011549700007890351,1625,79
+6,6311,3 roads on the route,block,A*,0.0010814000124810264,1625,79
+6,6311,3 roads on the route,block,batch repair,0.0233754999935627,1625,79
+6,6311,3 roads on the route,block,LPA*,0.008255900000222027,1625,79
+6,6311,3 roads on the route,clear,full Dijkstra,0.016396099992562085,605,79
+6,6311,3 roads on the route,clear,Dijkstra to t,0.010619900000165217,605,79
+6,6311,3 roads on the route,clear,A*,0.0006743999983882532,605,79
+6,6311,3 roads on the route,clear,batch repair,0.008268699995824136,605,79
+6,6311,3 roads on the route,clear,LPA*,0.002337700003408827,605,79
+6,6311,20-edge zone on the route,block,full Dijkstra,0.015673500005505048,2277,79
+6,6311,20-edge zone on the route,block,Dijkstra to t,0.010879299996304326,2277,79
+6,6311,20-edge zone on the route,block,A*,0.0008944000001065433,2277,79
+6,6311,20-edge zone on the route,block,batch repair,0.052591200001188554,2277,79
+6,6311,20-edge zone on the route,block,LPA*,0.012769599998136982,2277,79
+6,6311,20-edge zone on the route,clear,full Dijkstra,0.016490699999849312,809,79
+6,6311,20-edge zone on the route,clear,Dijkstra to t,0.009102100011659786,809,79
+6,6311,20-edge zone on the route,clear,A*,0.0006690000009257346,809,79
+6,6311,20-edge zone on the route,clear,batch repair,0.0191558999940753,809,79
+6,6311,20-edge zone on the route,clear,LPA*,0.0030692000000271946,809,79
+7,7971,1 road on the route,block,full Dijkstra,0.014924700008123182,2999,107
+7,7971,1 road on the route,block,Dijkstra to t,0.016370900004403666,2999,107
+7,7971,1 road on the route,block,A*,0.0020441999949980527,2999,107
+7,7971,1 road on the route,block,batch repair,0.012222399993333966,2999,107
+7,7971,1 road on the route,block,LPA*,0.016218800010392442,2999,107
+7,7971,1 road on the route,clear,full Dijkstra,0.014551500004017726,1474,107
+7,7971,1 road on the route,clear,Dijkstra to t,0.014202899998053908,1474,107
+7,7971,1 road on the route,clear,A*,0.0019571000011637807,1474,107
+7,7971,1 road on the route,clear,batch repair,0.0043329000036465,1474,107
+7,7971,1 road on the route,clear,LPA*,0.006361200008541346,1474,107
+7,7971,3 roads on the route,block,full Dijkstra,0.015666100007365458,5505,107
+7,7971,3 roads on the route,block,Dijkstra to t,0.016582599986577407,5505,107
+7,7971,3 roads on the route,block,A*,0.004070199996931478,5505,107
+7,7971,3 roads on the route,block,batch repair,0.011140300004626624,5505,107
+7,7971,3 roads on the route,block,LPA*,0.02934619999723509,5505,107
+7,7971,3 roads on the route,clear,full Dijkstra,0.015552700002444908,1523,107
+7,7971,3 roads on the route,clear,Dijkstra to t,0.015998000002582557,1523,107
+7,7971,3 roads on the route,clear,A*,0.0019712999928742647,1523,107
+7,7971,3 roads on the route,clear,batch repair,0.00463589999708347,1523,107
+7,7971,3 roads on the route,clear,LPA*,0.006995999996433966,1523,107
+7,7971,20-edge zone on the route,block,full Dijkstra,0.015209200006211177,1942,107
+7,7971,20-edge zone on the route,block,Dijkstra to t,0.01519160000316333,1942,107
+7,7971,20-edge zone on the route,block,A*,0.002303599991137162,1942,107
+7,7971,20-edge zone on the route,block,batch repair,0.006305400005658157,1942,107
+7,7971,20-edge zone on the route,block,LPA*,0.010562899988144636,1942,107
+7,7971,20-edge zone on the route,clear,full Dijkstra,0.016428500006441027,942,107
+7,7971,20-edge zone on the route,clear,Dijkstra to t,0.016356200008885935,942,107
+7,7971,20-edge zone on the route,clear,A*,0.0019592000026023015,942,107
+7,7971,20-edge zone on the route,clear,batch repair,0.0029781999910483137,942,107
+7,7971,20-edge zone on the route,clear,LPA*,0.004328200011514127,942,107
+8,1559,1 road on the route,block,full Dijkstra,0.01627230001031421,4667,110
+8,1559,1 road on the route,block,Dijkstra to t,0.016900200003874488,4667,110
+8,1559,1 road on the route,block,A*,0.0032293999975081533,4667,110
+8,1559,1 road on the route,block,batch repair,0.014668799994979054,4667,110
+8,1559,1 road on the route,block,LPA*,0.025835700012976304,4667,110
+8,1559,1 road on the route,clear,full Dijkstra,0.01515540000400506,2260,110
+8,1559,1 road on the route,clear,Dijkstra to t,0.0156109999952605,2260,110
+8,1559,1 road on the route,clear,A*,0.002882200002204627,2260,110
+8,1559,1 road on the route,clear,batch repair,0.0051485000003594905,2260,110
+8,1559,1 road on the route,clear,LPA*,0.009210699994582683,2260,110
+8,1559,3 roads on the route,block,full Dijkstra,0.015349799999967217,3376,110
+8,1559,3 roads on the route,block,Dijkstra to t,0.016977399995084852,3376,110
+8,1559,3 roads on the route,block,A*,0.0025566000113030896,3376,110
+8,1559,3 roads on the route,block,batch repair,0.008234400011133403,3376,110
+8,1559,3 roads on the route,block,LPA*,0.020383600000059232,3376,110
+8,1559,3 roads on the route,clear,full Dijkstra,0.01678679999895394,1649,110
+8,1559,3 roads on the route,clear,Dijkstra to t,0.015935500006889924,1649,110
+8,1559,3 roads on the route,clear,A*,0.0025569999997969717,1649,110
+8,1559,3 roads on the route,clear,batch repair,0.0038051000010455027,1649,110
+8,1559,3 roads on the route,clear,LPA*,0.007127400007448159,1649,110
+8,1559,20-edge zone on the route,block,full Dijkstra,0.018130099997506477,264,110
+8,1559,20-edge zone on the route,block,Dijkstra to t,0.016300500006764196,264,110
+8,1559,20-edge zone on the route,block,A*,0.0031814999965718016,264,110
+8,1559,20-edge zone on the route,block,batch repair,0.001422200002707541,264,110
+8,1559,20-edge zone on the route,block,LPA*,0.001629599995794706,264,110
+8,1559,20-edge zone on the route,clear,full Dijkstra,0.01623039999685716,149,110
+8,1559,20-edge zone on the route,clear,Dijkstra to t,0.01627310000185389,149,110
+8,1559,20-edge zone on the route,clear,A*,0.003057000008993782,149,110
+8,1559,20-edge zone on the route,clear,batch repair,0.0005660000024363399,149,110
+8,1559,20-edge zone on the route,clear,LPA*,0.0006373000069288537,149,110
+9,533,1 road on the route,block,full Dijkstra,0.0177518999989843,1800,110
+9,533,1 road on the route,block,Dijkstra to t,0.01789549998647999,1800,110
+9,533,1 road on the route,block,A*,0.003775699995458126,1800,110
+9,533,1 road on the route,block,batch repair,0.006018699990818277,1800,110
+9,533,1 road on the route,block,LPA*,0.010242500007734634,1800,110
+9,533,1 road on the route,clear,full Dijkstra,0.01684670000395272,913,110
+9,533,1 road on the route,clear,Dijkstra to t,0.016058200009865686,913,110
+9,533,1 road on the route,clear,A*,0.003250800000387244,913,110
+9,533,1 road on the route,clear,batch repair,0.001661500005866401,913,110
+9,533,1 road on the route,clear,LPA*,0.003653799998573959,913,110
+9,533,3 roads on the route,block,full Dijkstra,0.017136099995695986,1630,110
+9,533,3 roads on the route,block,Dijkstra to t,0.016280799987725914,1630,110
+9,533,3 roads on the route,block,A*,0.00376249999681022,1630,110
+9,533,3 roads on the route,block,batch repair,0.0047919000062393025,1630,110
+9,533,3 roads on the route,block,LPA*,0.008667499991133809,1630,110
+9,533,3 roads on the route,clear,full Dijkstra,0.015426700003445148,861,110
+9,533,3 roads on the route,clear,Dijkstra to t,0.014542899996740744,861,110
+9,533,3 roads on the route,clear,A*,0.0031097999890334904,861,110
+9,533,3 roads on the route,clear,batch repair,0.00164309999672696,861,110
+9,533,3 roads on the route,clear,LPA*,0.0033275000023422763,861,110
+9,533,20-edge zone on the route,block,full Dijkstra,0.016424400004325435,421,110
+9,533,20-edge zone on the route,block,Dijkstra to t,0.014016499990248121,421,110
+9,533,20-edge zone on the route,block,A*,0.0034127999970223755,421,110
+9,533,20-edge zone on the route,block,batch repair,0.001010599997243844,421,110
+9,533,20-edge zone on the route,block,LPA*,0.0024548000073991716,421,110
+9,533,20-edge zone on the route,clear,full Dijkstra,0.01646970000001602,195,110
+9,533,20-edge zone on the route,clear,Dijkstra to t,0.015987699996912852,195,110
+9,533,20-edge zone on the route,clear,A*,0.003294199996162206,195,110
+9,533,20-edge zone on the route,clear,batch repair,0.0003910000086762011,195,110
+9,533,20-edge zone on the route,clear,LPA*,0.0007623999990755692,195,110
+10,1034,1 road on the route,block,full Dijkstra,0.015447500001755543,504,79
+10,1034,1 road on the route,block,Dijkstra to t,0.008920899999793619,504,79
+10,1034,1 road on the route,block,A*,0.0012214999878779054,504,79
+10,1034,1 road on the route,block,batch repair,0.0013783999893348664,504,79
+10,1034,1 road on the route,block,LPA*,0.002485100005287677,504,79
+10,1034,1 road on the route,clear,full Dijkstra,0.014953299993067048,154,79
+10,1034,1 road on the route,clear,Dijkstra to t,0.008299900000565685,154,79
+10,1034,1 road on the route,clear,A*,0.0009579000034136698,154,79
+10,1034,1 road on the route,clear,batch repair,0.0005073999927844852,154,79
+10,1034,1 road on the route,clear,LPA*,0.0007536999910371378,154,79
+10,1034,3 roads on the route,block,full Dijkstra,0.01410859999305103,573,79
+10,1034,3 roads on the route,block,Dijkstra to t,0.009362899989355356,573,79
+10,1034,3 roads on the route,block,A*,0.001225900006829761,573,79
+10,1034,3 roads on the route,block,batch repair,0.008962699997937307,573,79
+10,1034,3 roads on the route,block,LPA*,0.003240999998524785,573,79
+10,1034,3 roads on the route,clear,full Dijkstra,0.016419399995356798,301,79
+10,1034,3 roads on the route,clear,Dijkstra to t,0.009262500010663643,301,79
+10,1034,3 roads on the route,clear,A*,0.0009608999971533194,301,79
+10,1034,3 roads on the route,clear,batch repair,0.003720200009411201,301,79
+10,1034,3 roads on the route,clear,LPA*,0.0013161000097170472,301,79
+10,1034,20-edge zone on the route,block,full Dijkstra,0.016415100006270222,253,79
+10,1034,20-edge zone on the route,block,Dijkstra to t,0.01019129999622237,253,79
+10,1034,20-edge zone on the route,block,A*,0.0011436000058893114,253,79
+10,1034,20-edge zone on the route,block,batch repair,0.0014061000110814348,253,79
+10,1034,20-edge zone on the route,block,LPA*,0.0014550000050803646,253,79
+10,1034,20-edge zone on the route,clear,full Dijkstra,0.01653690000239294,161,79
+10,1034,20-edge zone on the route,clear,Dijkstra to t,0.009070900006918237,161,79
+10,1034,20-edge zone on the route,clear,A*,0.0009565999935148284,161,79
+10,1034,20-edge zone on the route,clear,batch repair,0.0005333000008249655,161,79
+10,1034,20-edge zone on the route,clear,LPA*,0.0006747000006726012,161,79
+11,1103,1 road on the route,block,full Dijkstra,0.01649310000357218,308,120
+11,1103,1 road on the route,block,Dijkstra to t,0.020244200000888668,308,120
+11,1103,1 road on the route,block,A*,0.004484299992327578,308,120
+11,1103,1 road on the route,block,batch repair,0.0002905000001192093,308,120
+11,1103,1 road on the route,block,LPA*,0.0013615000061690807,308,120
+11,1103,1 road on the route,clear,full Dijkstra,0.014468999987002462,38,120
+11,1103,1 road on the route,clear,Dijkstra to t,0.017486299999291077,38,120
+11,1103,1 road on the route,clear,A*,0.0039474999939557165,38,120
+11,1103,1 road on the route,clear,batch repair,0.00010495000606169924,38,120
+11,1103,1 road on the route,clear,LPA*,0.00014770000416319817,38,120
+11,1103,3 roads on the route,block,full Dijkstra,0.014180700003635138,3142,120
+11,1103,3 roads on the route,block,Dijkstra to t,0.015079299992066808,3142,120
+11,1103,3 roads on the route,block,A*,0.003830700006801635,3142,120
+11,1103,3 roads on the route,block,batch repair,0.00410550000378862,3142,120
+11,1103,3 roads on the route,block,LPA*,0.017063699997379445,3142,120
+11,1103,3 roads on the route,clear,full Dijkstra,0.014824600002611987,1585,120
+11,1103,3 roads on the route,clear,Dijkstra to t,0.019674999988637865,1585,120
+11,1103,3 roads on the route,clear,A*,0.0050608000019565225,1585,120
+11,1103,3 roads on the route,clear,batch repair,0.0022690000041620806,1585,120
+11,1103,3 roads on the route,clear,LPA*,0.006733699992764741,1585,120
+11,1103,20-edge zone on the route,block,full Dijkstra,0.017858799998066388,2235,120
+11,1103,20-edge zone on the route,block,Dijkstra to t,0.01905189998797141,2235,120
+11,1103,20-edge zone on the route,block,A*,0.005609200001345016,2235,120
+11,1103,20-edge zone on the route,block,batch repair,0.0031285000004572794,2235,120
+11,1103,20-edge zone on the route,block,LPA*,0.011241600004723296,2235,120
+11,1103,20-edge zone on the route,clear,full Dijkstra,0.014904399999068119,1119,120
+11,1103,20-edge zone on the route,clear,Dijkstra to t,0.015119199990294874,1119,120
+11,1103,20-edge zone on the route,clear,A*,0.0038889999996172264,1119,120
+11,1103,20-edge zone on the route,clear,batch repair,0.001138599996920675,1119,120
+11,1103,20-edge zone on the route,clear,LPA*,0.004318600011174567,1119,120
+12,1082,1 road on the route,block,full Dijkstra,0.01527459999488201,170,103
+12,1082,1 road on the route,block,Dijkstra to t,0.013830500000040047,170,103
+12,1082,1 road on the route,block,A*,0.0026855000032810494,170,103
+12,1082,1 road on the route,block,batch repair,0.0001478000049246475,170,103
+12,1082,1 road on the route,block,LPA*,0.0006738999945810065,170,103
+12,1082,1 road on the route,clear,full Dijkstra,0.018957899999804795,9,103
+12,1082,1 road on the route,clear,Dijkstra to t,0.015523199996096082,9,103
+12,1082,1 road on the route,clear,A*,0.0028710000042337924,9,103
+12,1082,1 road on the route,clear,batch repair,6.0000005760230124e-05,9,103
+12,1082,1 road on the route,clear,LPA*,5.77000027988106e-05,9,103
+12,1082,3 roads on the route,block,full Dijkstra,0.017227300006197765,5104,103
+12,1082,3 roads on the route,block,Dijkstra to t,0.01517240000248421,5104,103
+12,1082,3 roads on the route,block,A*,0.00262539999675937,5104,103
+12,1082,3 roads on the route,block,batch repair,0.02486200000566896,5104,103
+12,1082,3 roads on the route,block,LPA*,0.02937660001043696,5104,103
+12,1082,3 roads on the route,clear,full Dijkstra,0.016452800002298318,2445,103
+12,1082,3 roads on the route,clear,Dijkstra to t,0.014007699996000156,2445,103
+12,1082,3 roads on the route,clear,A*,0.0024516000121366233,2445,103
+12,1082,3 roads on the route,clear,batch repair,0.008188699997845106,2445,103
+12,1082,3 roads on the route,clear,LPA*,0.010659999999916181,2445,103
+12,1082,20-edge zone on the route,block,full Dijkstra,0.016809000007924624,12381,103
+12,1082,20-edge zone on the route,block,Dijkstra to t,0.01851030001125764,12381,103
+12,1082,20-edge zone on the route,block,A*,0.016207000007852912,12381,103
+12,1082,20-edge zone on the route,block,batch repair,0.000130899999930989,12381,103
+12,1082,20-edge zone on the route,block,LPA*,0.05561979999765754,12381,103
+12,1082,20-edge zone on the route,clear,full Dijkstra,0.01677610000479035,5,103
+12,1082,20-edge zone on the route,clear,Dijkstra to t,0.014394900004845113,5,103
+12,1082,20-edge zone on the route,clear,A*,0.002742899989243597,5,103
+12,1082,20-edge zone on the route,clear,batch repair,5.715000588679686e-05,5,103
+12,1082,20-edge zone on the route,clear,LPA*,3.2199997804127634e-05,5,103
+13,2766,1 road on the route,block,full Dijkstra,0.01478119999228511,508,92
+13,2766,1 road on the route,block,Dijkstra to t,0.010905599992838688,508,92
+13,2766,1 road on the route,block,A*,0.0021284999966155738,508,92
+13,2766,1 road on the route,block,batch repair,0.002956099997390993,508,92
+13,2766,1 road on the route,block,LPA*,0.002405799998086877,508,92
+13,2766,1 road on the route,clear,full Dijkstra,0.015073599992319942,249,92
+13,2766,1 road on the route,clear,Dijkstra to t,0.011420800001360476,249,92
+13,2766,1 road on the route,clear,A*,0.0020924999989802018,249,92
+13,2766,1 road on the route,clear,batch repair,0.0010813999979291111,249,92
+13,2766,1 road on the route,clear,LPA*,0.0009183999936794862,249,92
+13,2766,3 roads on the route,block,full Dijkstra,0.017823400004999712,450,92
+13,2766,3 roads on the route,block,Dijkstra to t,0.0199265999981435,450,92
+13,2766,3 roads on the route,block,A*,0.004110800000489689,450,92
+13,2766,3 roads on the route,block,batch repair,0.004558699991321191,450,92
+13,2766,3 roads on the route,block,LPA*,0.004332800002885051,450,92
+13,2766,3 roads on the route,clear,full Dijkstra,0.021440700002131052,240,92
+13,2766,3 roads on the route,clear,Dijkstra to t,0.016009200000553392,240,92
+13,2766,3 roads on the route,clear,A*,0.0031350999925052747,240,92
+13,2766,3 roads on the route,clear,batch repair,0.0014526000013574958,240,92
+13,2766,3 roads on the route,clear,LPA*,0.0009875999967334792,240,92
+13,2766,20-edge zone on the route,block,full Dijkstra,0.01822589999937918,669,92
+13,2766,20-edge zone on the route,block,Dijkstra to t,0.01263729999482166,669,92
+13,2766,20-edge zone on the route,block,A*,0.002210999999078922,669,92
+13,2766,20-edge zone on the route,block,batch repair,0.0029850999999325722,669,92
+13,2766,20-edge zone on the route,block,LPA*,0.003115499988780357,669,92
+13,2766,20-edge zone on the route,clear,full Dijkstra,0.017365699997753836,336,92
+13,2766,20-edge zone on the route,clear,Dijkstra to t,0.012754600000334904,336,92
+13,2766,20-edge zone on the route,clear,A*,0.0022724000009475276,336,92
+13,2766,20-edge zone on the route,clear,batch repair,0.0013512000004993752,336,92
+13,2766,20-edge zone on the route,clear,LPA*,0.0012654000020120293,336,92
+14,19531,1 road on the route,block,full Dijkstra,0.015744300006190315,102,90
+14,19531,1 road on the route,block,Dijkstra to t,0.012616199994226918,102,90
+14,19531,1 road on the route,block,A*,0.0017954000068129972,102,90
+14,19531,1 road on the route,block,batch repair,8.795000030659139e-05,102,90
+14,19531,1 road on the route,block,LPA*,0.0004794000051333569,102,90
+14,19531,1 road on the route,clear,full Dijkstra,0.01696809999702964,51,90
+14,19531,1 road on the route,clear,Dijkstra to t,0.01104900000791531,51,90
+14,19531,1 road on the route,clear,A*,0.0017545999871799722,51,90
+14,19531,1 road on the route,clear,batch repair,3.2099997042678297e-05,51,90
+14,19531,1 road on the route,clear,LPA*,0.00017800000205170363,51,90
+14,19531,3 roads on the route,block,full Dijkstra,0.01576549999299459,2730,90
+14,19531,3 roads on the route,block,Dijkstra to t,0.011389400009647943,2730,90
+14,19531,3 roads on the route,block,A*,0.00198090000776574,2730,90
+14,19531,3 roads on the route,block,batch repair,0.012733499999740161,2730,90
+14,19531,3 roads on the route,block,LPA*,0.014146200002869591,2730,90
+14,19531,3 roads on the route,clear,full Dijkstra,0.01765059999888763,1298,90
+14,19531,3 roads on the route,clear,Dijkstra to t,0.013755000007222407,1298,90
+14,19531,3 roads on the route,clear,A*,0.0019708000036189333,1298,90
+14,19531,3 roads on the route,clear,batch repair,0.0055961000034585595,1298,90
+14,19531,3 roads on the route,clear,LPA*,0.005048700011684559,1298,90
+14,19531,20-edge zone on the route,block,full Dijkstra,0.016455799996037968,317,90
+14,19531,20-edge zone on the route,block,Dijkstra to t,0.011598199998843484,317,90
+14,19531,20-edge zone on the route,block,A*,0.001859399999375455,317,90
+14,19531,20-edge zone on the route,block,batch repair,0.00027165000210516155,317,90
+14,19531,20-edge zone on the route,block,LPA*,0.0015091999957803637,317,90
+14,19531,20-edge zone on the route,clear,full Dijkstra,0.014367700001457706,139,90
+14,19531,20-edge zone on the route,clear,Dijkstra to t,0.011216899991268292,139,90
+14,19531,20-edge zone on the route,clear,A*,0.001782499995897524,139,90
+14,19531,20-edge zone on the route,clear,batch repair,0.00010659999679774046,139,90
+14,19531,20-edge zone on the route,clear,LPA*,0.0005186999915167689,139,90

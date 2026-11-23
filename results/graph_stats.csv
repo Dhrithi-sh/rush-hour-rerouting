@@ -1,0 +1,4 @@
+graph,source,n,m,avg_out_degree,hop_diameter,oneway_frac
+synthetic,synthetic,19580,67980,3.4719101123595504,278,0.057664018829067375
+bologna_italy,OpenStreetMap,5450,10740,1.9706422018348624,94,0.4245810055865922
+salt_lake_city_utah_usa,OpenStreetMap,5459,14262,2.6125664041033154,98,0.1480858224652924
