@@ -35,5 +35,10 @@ if __name__ == "__main__":
     run([py, "-m", "pytest"])
     run([py, os.path.join("experiments", "run_experiments.py")] + rest)
     run([py, os.path.join("report", "build_report.py"), "--results", known.out, "--out", known.report])
+    # RESULTS_AND_INFORMATION.md: in the repo root for the default results folder,
+    # otherwise next to the results (so smoke runs never overwrite the committed one).
+    default_out = os.path.normcase(os.path.abspath(known.out)) == os.path.normcase(os.path.join(ROOT, "results"))
+    summary = os.path.join(ROOT if default_out else known.out, "RESULTS_AND_INFORMATION.md")
+    run([py, os.path.join("report", "build_summary.py"), "--results", known.out, "--out", summary])
     print(f"\nAll done in {time.time() - t0:.0f} s. Report: {os.path.relpath(known.report, ROOT)}; "
           f"results: {os.path.relpath(known.out, ROOT)}")

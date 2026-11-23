@@ -26,6 +26,16 @@ MODE_NAME = {"single": "scattered closures", "cluster": "accident zone",
              "wave": "congestion wave", "tree": "tree-edge closures"}
 RANDOM_MODES = ["single", "cluster", "wave"]     # random placement (may hit no shortest path)
 
+# Team (title page + Appendix A). Edit the order here if roles are assigned differently.
+TEAM = [
+    ("Dhrithi Shashibushan", "Graph & Data Lead",
+     "Graph loading (OSMnx/synthetic), weights, disruption simulator; Section 1"),
+    ("Avishi Singh", "Algorithms Lead",
+     "Dijkstra baseline, incremental and batch repair, LPA*, tests; Section 2"),
+    ("Kritika Singh", "Theory Lead", "Proofs of correctness and complexity analysis; Sections 3–4"),
+    ("Pankhuri Singhal", "Experiments Lead", "Benchmarks, figures, report assembly; Sections 5–7"),
+]
+
 
 # ----------------------------------------------------------------- helpers
 def shade(cell_or_par, fill):
@@ -252,8 +262,7 @@ def build(R, out):
         "on a road network under accidents and congestion",
         italic=True, align="center", size=12, after=30)
     D.p("Problem 11: Adaptive Path-Finding in Dynamic Weighted Graphs", align="center", size=12, after=40)
-    D.p("Team: [Member A: Graph & Data Lead] · [Member B: Algorithms Lead] · "
-        "[Member C: Theory Lead] · [Member D: Experiments & Visualisation Lead]",
+    D.p("Team: " + " · ".join(f"{name} ({role})" for name, role, _ in TEAM),
         align="center", size=10.5, after=4)
     D.p("[Course / Institution] · [Date]", align="center", size=10.5)
     D.d.add_page_break()
@@ -832,11 +841,8 @@ UPDATE-EDGES(changes):
     # ---------- appendices
     D.h("Appendix A. Team contributions", 1)
     D.table(["Member", "Role", "Contribution"],
-            [["[Name A]", "Graph & Data Lead", "Graph loading (OSMnx/synthetic), weights, disruption simulator; Section 1"],
-             ["[Name B]", "Algorithms Lead", "Dijkstra baseline, incremental and batch repair, LPA*, tests; Section 2"],
-             ["[Name C]", "Theory Lead", "Proofs of correctness and complexity analysis; Sections 3–4"],
-             ["[Name D]", "Experiments Lead", "Benchmarks, figures, report assembly; Sections 5–7"],
-             ["All", "", "Section 8; peer review of one other section each"]],
+            [list(member) for member in TEAM]
+            + [["All", "", "Section 8; peer review of one other section each"]],
             widths=[2.5, 3.5, 10.0])
     D.h("Appendix B. Reproducing the results", 1)
     D.code("""

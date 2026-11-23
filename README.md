@@ -32,7 +32,8 @@ python run_all.py
 ```
 
 Runs, in order: tests (pytest + hypothesis) → experiments (CSVs + figures in `results/`) →
-`report/Rush_Hour_Rerouting_Report.docx`. `run_all.py` prints its own wall time at the end.
+`report/Rush_Hour_Rerouting_Report.docx` → `RESULTS_AND_INFORMATION.md` (project context, every figure and
+the key numbers, generated from `results/`; **start here** for a quick overview). `run_all.py` prints its own wall time at the end.
 
 | Command | What it does | Time (measured) |
 |---|---|---|
@@ -62,7 +63,8 @@ python scripts/fetch_cities.py           # Salt Lake City (USA, grid) and Bologn
 python run_all.py                        # picks up every data/*.graphml automatically
 ```
 
-Downloads are cached in `data/` (not committed; they are 5–10 MB each). Cached files are read with
+The two networks used in the results are committed in `data/` (© OpenStreetMap contributors, ODbL), so
+the real-city experiments work offline straight after cloning. Cached files are read with
 plain networkx if osmnx is not installed. The loader supports osmnx 1.x and 2.x. If no real network is
 cached, the report's real-city section says so instead of showing numbers.
 
@@ -105,6 +107,9 @@ src/rush_hour/osm.py          OpenStreetMap download + cached .graphml loading (
 src/rush_hour/stats.py        graph statistics (degree, hop diameter, one-way fraction)
 experiments/                  run_experiments.py (all experiments) + plots.py (figures)
 report/build_report.py        results/ -> Rush_Hour_Rerouting_Report.docx
+report/build_summary.py       results/ -> RESULTS_AND_INFORMATION.md
+RESULTS_AND_INFORMATION.md    generated overview of the project, figures and results
+data/                         cached OpenStreetMap networks used in the results
 scripts/fetch_cities.py       download + cache the real networks
 tests/                        unit tests, LPA* tests, hypothesis property tests
 results/                      CSVs, figures, meta.json (generated)
@@ -130,7 +135,9 @@ Weights are **positive integers** (travel time in deciseconds); `INF` deletes an
 
 ## 7. Before you submit
 
-* Fill in the team names, course and date on the title page and in Appendix A of the report.
+* Team: Dhrithi Shashibushan, Avishi Singh, Kritika Singh, Pankhuri Singhal. Their roles in the report
+  come from the `TEAM` list at the top of `report/build_report.py`; fix the order there if needed.
+* Fill in the course and date on the title page of the report.
 * Check the reference list against the original papers.
 * The PDF is only produced if LibreOffice is installed; otherwise export the .docx to PDF manually.
 * You should be able to explain every proof step and figure in your own words.

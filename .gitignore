@@ -5,6 +5,6 @@ __pycache__/
 .hypothesis/
 .ruff_cache/
 *.egg-info/
-data/**/*.graphml
+data/extra/
 cache/
 ci-results/
