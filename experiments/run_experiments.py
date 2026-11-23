@@ -306,6 +306,22 @@ def exp_crossgraph(graphs, modes, sizes, trials, seed, methods, closure):
     return pd.concat(frames, ignore_index=True)
 
 
+def _portable(v):
+    """Paths inside the project as relative POSIX paths (meta.json must not contain
+    machine-specific absolute paths); other values unchanged."""
+    if isinstance(v, list):
+        return [_portable(x) for x in v]
+    if isinstance(v, str) and os.path.isabs(v):
+        try:
+            rel = os.path.relpath(v, ROOT)
+        except ValueError:            # different drive on Windows
+            return os.path.basename(v)
+        return rel.replace(os.sep, "/") if not rel.startswith("..") else os.path.basename(v)
+    if isinstance(v, str) and os.sep != "/" and os.sep in v:
+        return v.replace(os.sep, "/")
+    return v
+
+
 def git_commit():
     """Current git commit of the repository (None if unavailable), plus a flag telling
     whether the *code* differs from that commit (generated results/report are ignored)."""
@@ -668,8 +684,9 @@ def main():
     big = mk[mk["affected"] >= 50]
     sha, dirty = git_commit()
     meta = dict(git_commit=sha, git_dirty=dirty,
-                command="python " + " ".join([os.path.relpath(sys.argv[0], ROOT)] + sys.argv[1:]),
-                args=vars(a), graph_source=source, n=g.n, m=m, depot=s, seed=a.seed, trials=a.trials,
+                command="python " + " ".join(_portable(x) for x in sys.argv),
+                args={k: _portable(v) for k, v in vars(a).items()}, graph_source=source,
+                n=g.n, m=m, depot=s, seed=a.seed, trials=a.trials,
                 sizes=sizes, modes=modes, methods=methods, closure=a.closure,
                 block_factor=BLOCK_FACTOR, fleet_size=a.fleet_size,
                 timing=dict(min_total_s=MIN_TOTAL, min_reps=MIN_REPS, max_reps=MAX_REPS,

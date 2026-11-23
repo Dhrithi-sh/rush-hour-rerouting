@@ -82,11 +82,16 @@ class Doc:
         return par
 
     def _runs(self, par, text, bold=False, italic=False, size=None):
-        # inline markup: **bold**, *italic*, `code`
+        # inline markup: **bold**, *italic*, `code`; \* is a literal asterisk. An italic
+        # marker must not touch a letter on its outer side, so "LPA*" and "A* search"
+        # stay literal.
         import re
-        for tok in re.split(r"(\*\*.+?\*\*|\*[^*\s][^*]*?\*|`[^`]+`)", text):
+        italic_re = r"(?<![\w*\\\x00])\*(?=[^\s*])[^*\n]*?[^\s*\\]\*(?![\w*])"
+        text = text.replace("\\*", "\x00")
+        for tok in re.split(rf"(\*\*.+?\*\*|{italic_re}|`[^`]+`)", text):
             if not tok:
                 continue
+            tok = tok.replace("\x00", "\\*")       # restored below, after markers are stripped
             b, i, code = bold, italic, False
             if tok.startswith("**") and tok.endswith("**") and len(tok) > 4:
                 tok, b = tok[2:-2], True
@@ -94,7 +99,7 @@ class Doc:
                 tok, code = tok[1:-1], True
             elif tok.startswith("*") and tok.endswith("*") and len(tok) > 2:
                 tok, i = tok[1:-1], True
-            r = par.add_run(tok)
+            r = par.add_run(tok.replace("\\*", "*"))
             r.bold, r.italic = b, i
             if code:
                 r.font.name = "Consolas"
