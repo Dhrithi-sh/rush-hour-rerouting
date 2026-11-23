@@ -526,6 +526,9 @@ def summarise(df):
         t_repair_noop_ms=("t_repair_ms", "median")).reset_index()
     out = out.merge(eff, on=keys, how="left").merge(noop, on=keys, how="left")
     out["n_effective"] = out["n_effective"].fillna(0).astype(int)
+    # Make every statistic a plain float column (stable dtypes across pandas versions).
+    for col in out.columns.difference(keys + ["n_effective", "trials"]):
+        out[col] = pd.to_numeric(out[col]).astype(float)
     return out
 
 

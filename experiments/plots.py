@@ -25,6 +25,11 @@ LABELS = {"single": "Scattered closures", "cluster": "Accident zone",
           "wave": "Congestion wave", "tree": "Tree-edge closures"}
 
 
+def _fill(ax, x, lo, hi, **kw):
+    """fill_between on plain float arrays: matplotlib 3.7.0 fails on pandas Series here."""
+    ax.fill_between(*(np.asarray(v, dtype=float) for v in (x, lo, hi)), **kw)
+
+
 def style():
     plt.rcParams.update({"figure.dpi": 150, "savefig.bbox": "tight", "axes.grid": True,
                          "grid.alpha": .3, "axes.spines.top": False,
@@ -45,7 +50,7 @@ def fig_speedup(summ, path, n, modes, methods):
             c = METHOD_COLORS[method]
             ax.plot(s["size"], s["speedup_med"], "-", marker="o", ms=3, color=c,
                     label=f"{METHOD_LABELS[method]}: all")
-            ax.fill_between(s["size"], s["speedup_q25"], s["speedup_q75"], color=c, alpha=.12)
+            _fill(ax, s["size"], s["speedup_q25"], s["speedup_q75"], color=c, alpha=.12)
             e = s.dropna(subset=["speedup_eff_med"])
             ax.plot(e["size"], e["speedup_eff_med"], ":", marker="^", ms=3, color=c,
                     label=f"{METHOD_LABELS[method]}: effective only")
@@ -68,13 +73,13 @@ def fig_runtime(summ, path, modes, methods):
             s = _sel(summ, mode, method)
             c = METHOD_COLORS[method]
             ax.plot(s["size"], s["t_repair_ms"], "o-", ms=3, color=c, label=f"{METHOD_LABELS[method]}")
-            ax.fill_between(s["size"], s["t_repair_ms_q25"], s["t_repair_ms_q75"], color=c, alpha=.12)
+            _fill(ax, s["size"], s["t_repair_ms_q25"], s["t_repair_ms_q75"], color=c, alpha=.12)
             e = s.dropna(subset=["t_repair_eff_ms"])
             ax.plot(e["size"], e["t_repair_eff_ms"], ":", ms=3, color=c)
         s = _sel(summ, mode, methods[0])
         ax.plot(s["size"], s["t_full_ms"], "s--", ms=3, color=METHOD_COLORS["dijkstra"],
                 label=METHOD_LABELS["dijkstra"])
-        ax.fill_between(s["size"], s["t_full_ms_q25"], s["t_full_ms_q75"],
+        _fill(ax, s["size"], s["t_full_ms_q25"], s["t_full_ms_q75"],
                         color=METHOD_COLORS["dijkstra"], alpha=.1)
         ax.set_xscale("log"); ax.set_yscale("log"); ax.set_title(LABELS[mode], fontsize=10)
         ax.set_xlabel("disruption size (edges)")
@@ -231,7 +236,7 @@ def fig_cross_graph(xsum, path, graphs, methods, modes=("tree", "cluster")):
                 s = d[d["method"] == method].sort_values("size")
                 c = METHOD_COLORS[method]
                 ax.plot(s["size"], s["speedup_med"], "o-", ms=3, color=c, label=METHOD_LABELS[method])
-                ax.fill_between(s["size"], s["speedup_q25"], s["speedup_q75"], color=c, alpha=.12)
+                _fill(ax, s["size"], s["speedup_q25"], s["speedup_q75"], color=c, alpha=.12)
             ax.axhline(1, color="k", lw=1)
             ax.set_xscale("log"); ax.set_yscale("log")
             if i == 0:
