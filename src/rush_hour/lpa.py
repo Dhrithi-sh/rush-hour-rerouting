@@ -13,13 +13,16 @@ edge. `straight_line_heuristic` builds one for road graphs; it stays consistent
 as long as no edge becomes *faster* than it was when the heuristic was built
 (closures and congestion only slow roads down, and clearing restores them).
 """
+from __future__ import annotations
+
 import heapq
 import math
+from collections.abc import Iterable, Sequence
 
-from graph import INF
+from .graph import INF, Graph
 
 
-def straight_line_heuristic(g, t, slack=1e-9):
+def straight_line_heuristic(g: Graph, t: int, slack: float = 1e-9) -> list[float]:
     """h(x) = straight-line distance(x, t) / v_max, with v_max the largest
     'distance per unit weight' over all current edges. Using the graph's own
     fastest edge (instead of a nominal speed limit) makes h consistent despite the
@@ -38,12 +41,12 @@ def straight_line_heuristic(g, t, slack=1e-9):
     return [math.hypot(x - xt, y - yt) / vmax for x, y in xy]
 
 
-def is_consistent(g, h, t):
+def is_consistent(g: Graph, h: Sequence[float], t: int) -> bool:
     """True if h(t) == 0 and h(u) <= w(u, v) + h(v) on every edge."""
     return h[t] == 0 and all(h[u] <= w + h[v] for u in range(g.n) for v, w in g.out[u].items())
 
 
-def astar(g, s, t, h):
+def astar(g: Graph, s: int, t: int, h: Sequence[float]) -> float:
     """Plain A* from scratch; returns the s -> t distance (INF if unreachable)."""
     dist = {s: 0}
     heap = [(h[s], 0, s)]
@@ -63,7 +66,7 @@ def astar(g, s, t, h):
     return INF
 
 
-def dijkstra_to(g, s, t):
+def dijkstra_to(g: Graph, s: int, t: int) -> float:
     """Dijkstra from scratch that stops as soon as t is settled."""
     dist = {s: 0}
     heap = [(0, s)]
@@ -90,7 +93,7 @@ class LPAStar:
     repairs; distance() and path() then describe the new shortest s -> t path.
     """
 
-    def __init__(self, g, s, t, h=None):
+    def __init__(self, g: Graph, s: int, t: int, h: Sequence[float] | None = None) -> None:
         self.g, self.s, self.t = g, s, t
         self.h = list(h) if h is not None else [0.0] * g.n
         self.gv = [INF] * g.n
@@ -132,7 +135,7 @@ class LPAStar:
             self.inq.pop(x, None)
 
     # ---- main loop -------------------------------------------------------
-    def compute(self):
+    def compute(self) -> int:
         """Process inconsistent nodes until t is consistent and no queued key is
         smaller than t's. Returns the number of node expansions."""
         t, gv, rhs, out = self.t, self.gv, self.rhs, self.g.out
@@ -152,7 +155,7 @@ class LPAStar:
                     self._update_vertex(z)
         return expanded
 
-    def update_edges(self, changes):
+    def update_edges(self, changes: Iterable[tuple[int, int, float]]) -> int:
         """Apply weight changes (INF = delete) and repair. Returns expansions."""
         g = self.g
         heads = set()
@@ -163,10 +166,11 @@ class LPAStar:
             self._update_vertex(v)
         return self.compute()
 
-    def distance(self):
+    def distance(self) -> float:
+        """Current shortest s -> t travel time (INF if unreachable)."""
         return self.gv[self.t]
 
-    def path(self):
+    def path(self) -> list[int]:
         """Shortest s -> t path as a node list ([] if unreachable)."""
         if self.gv[self.t] == INF:
             return []
@@ -177,10 +181,12 @@ class LPAStar:
         path.reverse()
         return path
 
-    def snapshot(self):
+    def snapshot(self) -> tuple:
+        """Copy of the search state (g, rhs, queue), for restore()."""
         return list(self.gv), list(self.rhs), list(self.heap), dict(self.inq)
 
-    def restore(self, snap):
+    def restore(self, snap: tuple) -> None:
+        """Restore the search state (the graph must be restored separately)."""
         self.gv[:] = snap[0]
         self.rhs[:] = snap[1]
         self.heap = list(snap[2])

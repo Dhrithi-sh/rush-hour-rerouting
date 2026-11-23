@@ -194,6 +194,8 @@ class Results:
         self.marks = self.opt("raw_marks.csv")
         self.cross = self.opt("summary_crossgraph.csv")
         self.gstats = self.opt("graph_stats.csv")
+        if self.gstats is None or not (self.gstats["source"] == "OpenStreetMap").any():
+            self.cross = self.gstats = None      # no real network in this run: report says "not yet generated"
         self.sizes = sorted(self.summ["size"].unique())
         self.methods = list(self.summ["method"].unique())
 
@@ -256,8 +258,8 @@ def build(R, out):
     xo_pairs = []
     for md in modes:
         a, b = xo.get(md), xob.get(md)
-        xo_pairs.append(f"{MODE_NAME[md]} {('≈ %d' % a) if a else '> %d' % hi}"
-                        + (f" → {('≈ %d' % b) if b else '> %d' % hi}" if has_batch else ""))
+        xo_pairs.append(f"{MODE_NAME[md]} {f'≈ {a:.0f}' if a else f'> {hi}'}"
+                        + (f" → {f'≈ {b:.0f}' if b else f'> {hi}'}" if has_batch else ""))
     D.p(f"When accidents or congestion change travel times on a road network, a routing service must "
         f"update its shortest-path tree. The textbook response is to rerun Dijkstra’s algorithm from "
         f"scratch; an incremental alternative in the style of Ramalingam and Reps re-examines only the "
@@ -409,8 +411,8 @@ UPDATE-EDGES(changes):
         "and congestion because they only make roads slower. LPA* is implemented in its own module "
         "(`src/lpa.py`) with separate tests.")
     D.h("2.7 Disruption models", 2)
-    D.bullets([f"**Scattered closures:** k independent random edges are blocked.",
-               f"**Accident zone:** k connected edges around a random point (BFS order) are blocked.",
+    D.bullets(["**Scattered closures:** k independent random edges are blocked.",
+               "**Accident zone:** k connected edges around a random point (BFS order) are blocked.",
                "**Congestion wave:** k connected edges around a random epicentre are slowed by a factor "
                "1 + 9·e^(−h/2), where h is the hop distance from the epicentre, so the effect fades with distance.",
                "**Tree-edge closures:** k edges of the current shortest-path tree are blocked. Every such road "
@@ -1062,11 +1064,27 @@ def _cross_section(D, R):
     D.table(["Network", "Disruption", "Speed-up, 1 edge (effective)", "Break-even per-edge", "Break-even batch"], rows,
             caption="Core results per network (blocking phase, median over trials).",
             widths=[4.2, 3.2, 3.0, 2.8, 2.8], size=9)
-    D.p("The qualitative picture is the same on every network: a single blocked road that carries shortest paths "
-        "is repaired orders of magnitude faster than a recomputation, the advantage shrinks with the size of the "
-        "disruption, and batch repair moves the break-even point to larger disruptions. Differences in the "
-        "break-even points follow the network structure: networks with a larger hop diameter have deeper "
-        "shortest-path trees and therefore larger subtrees below a typical tree edge.")
+    xg = R.meta.get("crossgraph", {})
+    one = {gname: cs[(cs["graph"] == gname) & (cs["mode"] == "tree") & (cs["phase"] == "block")
+                     & (cs["method"] == "sequential")].sort_values("size").iloc[0]["speedup_eff_med"]
+           for gname in gs["graph"]}
+
+    def later(gname, md):          # batch break-even later than (or not reached where) per-edge breaks even
+        a_, b_ = xg.get(gname, {}).get("sequential", {}).get(md), xg.get(gname, {}).get("batch", {}).get(md)
+        return a_ is not None and (b_ is None or b_ >= a_)
+    pairs = [(gname, md) for gname in gs["graph"] for md in ("tree", "cluster")
+             if xg.get(gname, {}).get("sequential", {}).get(md) is not None]
+    n_later = sum(later(gname, md) for gname, md in pairs)
+    D.p("On every network a single blocked tree edge was repaired far faster than a recomputation ("
+        + ", ".join(f"{gname.replace('_', ' ')}: {x(v)}" for gname, v in one.items())
+        + "), and the speed-up fell as disruptions grew. "
+        + (f"Where per-edge repair reached a break-even point ({len(pairs)} network/model combinations), batch repair "
+           f"broke even at the same or a larger size, or not at all, in {n_later} of them. " if pairs else
+           "Within the tested sizes no break-even point was reached on these networks. ")
+        + (lambda r: f"Structurally the networks differ most in one-way streets and degree: {r['graph'].replace('_', ' ')} "
+           f"has the highest share of one-way edges ({100 * r['oneway_frac']:.0f}%) and an average out-degree of "
+           f"{r['avg_out_degree']:.2f}, which leaves fewer alternative routes around a closure.")(
+            gs.sort_values("oneway_frac").iloc[-1]))
     D.figure(R.path("fig9_cross_graph.png"),
              "Speed-up over full Dijkstra versus disruption size on the synthetic city and the real networks "
              "(tree-edge closures and accident zones; solid = per-edge repair, dashed = batch repair).")

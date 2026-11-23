@@ -1,14 +1,11 @@
 """Randomised correctness tests: after EVERY update the incremental repair must
 equal a from-scratch Dijkstra. Run:  python tests/test_correctness.py"""
-import os
 import random
-import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from graph import Graph, INF, make_synthetic_city, from_networkx  # noqa: E402
-from sssp import DynamicSSSP, dijkstra, check_tree                  # noqa: E402
-from disruptions import MODES, CLOSURES, BLOCK_FACTOR, blocked, generate  # noqa: E402
+from rush_hour.disruptions import BLOCK_FACTOR, CLOSURES, MODES, blocked, generate
+from rush_hour.graph import INF, Graph, from_networkx, make_synthetic_city
+from rush_hour.sssp import DynamicSSSP, check_tree, dijkstra
 
 
 def random_graph(rng, n, m, wmax):

@@ -217,3 +217,30 @@ def fig_p2p(pp, path, methods):
     axes[0].legend(fontsize=7, ncol=2)
     fig.suptitle("Point-to-point rerouting depot → destination (bars = median, whiskers = IQR)", fontsize=10)
     fig.savefig(path); plt.close(fig)
+
+
+def fig_cross_graph(xsum, path, graphs, methods, modes=("tree", "cluster")):
+    """Speed-up vs disruption size per network (columns) and disruption model (rows)."""
+    fig, axes = plt.subplots(len(modes), len(graphs), figsize=(3.3 * len(graphs), 2.9 * len(modes)),
+                             sharey=True, squeeze=False)
+    for i, mode in enumerate(modes):
+        for j, name in enumerate(graphs):
+            ax = axes[i][j]
+            d = xsum[(xsum["graph"] == name) & (xsum["mode"] == mode) & (xsum["phase"] == "block")]
+            for method in methods:
+                s = d[d["method"] == method].sort_values("size")
+                c = METHOD_COLORS[method]
+                ax.plot(s["size"], s["speedup_med"], "o-", ms=3, color=c, label=METHOD_LABELS[method])
+                ax.fill_between(s["size"], s["speedup_q25"], s["speedup_q75"], color=c, alpha=.12)
+            ax.axhline(1, color="k", lw=1)
+            ax.set_xscale("log"); ax.set_yscale("log")
+            if i == 0:
+                ax.set_title(name.replace("_", " "), fontsize=9)
+            if i == len(modes) - 1:
+                ax.set_xlabel("disruption size (edges)")
+            if j == 0:
+                ax.set_ylabel(f"{LABELS[mode]}\nspeed-up (×)", fontsize=9)
+    axes[0][0].legend(fontsize=7, loc="lower left")
+    fig.suptitle("Speed-up over full Dijkstra on each network (median, band = IQR, black line = break-even)",
+                 fontsize=10)
+    fig.savefig(path); plt.close(fig)

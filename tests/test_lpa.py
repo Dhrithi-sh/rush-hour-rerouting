@@ -1,15 +1,11 @@
 """LPA*, A* and early-exit Dijkstra must agree with a full Dijkstra after every
 change. Run:  python tests/test_lpa.py"""
-import os
 import random
-import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
-from graph import Graph, INF, make_synthetic_city                       # noqa: E402
-from sssp import dijkstra                                               # noqa: E402
-from lpa import (LPAStar, astar, dijkstra_to, is_consistent,            # noqa: E402
-                 straight_line_heuristic)
+from rush_hour.graph import INF, Graph, make_synthetic_city
+from rush_hour.lpa import LPAStar, astar, dijkstra_to, is_consistent, straight_line_heuristic
+from rush_hour.sssp import dijkstra
 
 
 def path_len(g, p):

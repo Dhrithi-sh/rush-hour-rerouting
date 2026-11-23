@@ -11,12 +11,12 @@ by osmnx). `run_all.py` then picks up every data/*.graphml automatically, and
 import os
 import sys
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-sys.path.insert(0, os.path.join(ROOT, "src"))
-from osm import download, load_graph_file, slug  # noqa: E402
+from rush_hour.osm import download, load_graph_file, slug
 
-# A small grid-like US city and an irregular European one (5k-30k nodes each).
-DEFAULT_PLACES = ["Fargo, North Dakota, USA", "Bologna, Italy"]
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
+# A grid-like US city and an irregular European one (5k-30k nodes each in the largest SCC).
+DEFAULT_PLACES = ["Salt Lake City, Utah, USA", "Bologna, Italy"]
 
 
 def main(places):

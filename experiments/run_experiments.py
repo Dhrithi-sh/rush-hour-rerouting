@@ -8,26 +8,30 @@ Examples
 """
 import argparse
 import gc
+import glob
 import json
 import math
 import os
 import platform
 import random
 import statistics
+import subprocess
 import sys
 import time
 
 import numpy as np
 import pandas as pd
+import plots  # sibling module: experiments/plots.py
+
+from rush_hour.disruptions import BLOCK_FACTOR, CLOSURES, MODES, blocked, cluster_at, generate
+from rush_hour.graph import INF, make_synthetic_city
+from rush_hour.lpa import LPAStar, astar, dijkstra_to, straight_line_heuristic
+from rush_hour.osm import load_graph_file, load_osm, slug
+from rush_hour.sssp import DynamicSSSP, check_tree, dijkstra, dijkstra_tree
+from rush_hour.stats import graph_stats
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
-sys.path.insert(0, os.path.join(ROOT, "src"))
-import plots                                                       # noqa: E402
-from graph import INF, make_synthetic_city, load_osm               # noqa: E402
-from sssp import DynamicSSSP, dijkstra, dijkstra_tree, check_tree  # noqa: E402
-from disruptions import MODES, BLOCK_FACTOR, CLOSURES, blocked, generate  # noqa: E402
-from lpa import LPAStar, astar, dijkstra_to, straight_line_heuristic      # noqa: E402
 
 N_CHECKS = 0   # number of repair==Dijkstra equality assertions performed
 
@@ -285,10 +289,35 @@ def exp_fleet(g, s, n_vehicles, sizes, trials, seed, closure):
     return pd.DataFrame(rows)
 
 
-def _cluster_at(g, centre, k, closure):
-    from disruptions import _bfs_edges
-    return [(u, v, g.out[u][v], blocked(g.out[u][v], closure))
-            for (u, v), _ in _bfs_edges(g, centre, k)]
+_cluster_at = cluster_at
+
+
+def exp_crossgraph(graphs, modes, sizes, trials, seed, methods, closure):
+    """The core experiment (tree-edge closures and accident zones, per-edge vs
+    batch repair) on several networks. graphs: [(name, Graph)]."""
+    frames = []
+    for name, g in graphs:
+        s = pick_depot(g)
+        ks = [k for k in sizes if k <= g.m // 4]
+        print(f"  cross-graph: {name} (n={g.n:,}, m={g.m:,})", flush=True)
+        df = exp_main(g, s, modes, ks, trials, seed, methods, closure)
+        df.insert(0, "graph", name)
+        frames.append(df)
+    return pd.concat(frames, ignore_index=True)
+
+
+def git_commit():
+    """Current git commit of the repository (None if unavailable), plus a flag telling
+    whether the *code* differs from that commit (generated results/report are ignored)."""
+    code = ["src", "experiments", "tests", "scripts", "run_all.py", "report/build_report.py"]
+    try:
+        sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
+                             text=True, check=True).stdout.strip()
+        dirty = bool(subprocess.run(["git", "status", "--porcelain", "--", *code], cwd=ROOT,
+                                    capture_output=True, text=True).stdout.strip())
+        return sha, dirty
+    except (OSError, subprocess.CalledProcessError):
+        return None, None
 
 
 P2P_METHODS = ["full Dijkstra", "Dijkstra to t", "A*", "batch repair", "LPA*"]
@@ -516,7 +545,12 @@ def crossover(summ, mode, method="sequential", phase="block", col="speedup_med")
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--place", help="OSM place name, e.g. 'Piedmont, California, USA'")
+    ap.add_argument("--place", help="OSM place name, e.g. 'Piedmont, California, USA' (downloads + caches)")
+    ap.add_argument("--graph-file", help="use a cached .graphml (e.g. data/bologna_italy.graphml) as the "
+                                         "main graph; works offline")
+    ap.add_argument("--compare-graphs", nargs="*", default=None,
+                    help="extra .graphml networks for the cross-graph comparison "
+                         "(default: every data/*.graphml; pass no files to skip)")
     ap.add_argument("--width", type=int, default=140)
     ap.add_argument("--height", type=int, default=140)
     ap.add_argument("--seed", type=int, default=0)
@@ -538,13 +572,18 @@ def main():
     plots.style()
 
     t0 = time.time()
-    if a.place:
+    if a.graph_file:
+        print(f"Loading {a.graph_file} ...", flush=True)
+        g = load_graph_file(a.graph_file)
+        source = f"OpenStreetMap (cached file {os.path.basename(a.graph_file)})"
+    elif a.place:
         print(f"Loading OSM graph for '{a.place}' ...", flush=True)
         g = load_osm(a.place, os.path.join(ROOT, "data"))
         source = f"OpenStreetMap: {a.place}"
     else:
         g = make_synthetic_city(a.width, a.height, seed=a.seed)
-        source = f"Synthetic city ({a.width}x{a.height} perturbed grid, arterials, one-way streets, river with 4 bridges)"
+        source = (f"Synthetic city ({a.width}x{a.height} perturbed grid, arterials, one-way streets, "
+                  "river with 4 bridges)")
     s = pick_depot(g)
     m = g.m
     print(f"Graph: {g.n:,} nodes, {m:,} directed edges; depot = node {s}; closure = {a.closure}", flush=True)
@@ -584,12 +623,35 @@ def main():
                      max(5, a.trials // 2), a.seed)
     cl.to_csv(out("raw_closure.csv"), index=False)
 
-    print("[7/8] set() vs array marks micro-benchmark", flush=True)
+    print("[7/9] set() vs array marks micro-benchmark", flush=True)
     mk = exp_marks(g, s, 300 if not a.quick else 60, a.seed)
     mk.to_csv(out("raw_marks.csv"), index=False)
+
+    print("[8/9] cross-graph comparison (synthetic vs real networks)", flush=True)
+    files = (sorted(glob.glob(os.path.join(ROOT, "data", "*.graphml")))
+             if a.compare_graphs is None else a.compare_graphs)
+    if a.graph_file or a.place:
+        main_name = os.path.splitext(os.path.basename(a.graph_file))[0] if a.graph_file else slug(a.place)
+    else:
+        main_name = "synthetic"
+    graphs = [(main_name, g)]
+    for f in files:
+        name = os.path.splitext(os.path.basename(f))[0]
+        if name != main_name:
+            graphs.append((name, load_graph_file(f)))
+    cross_sizes = [1, 5, 20, 100, 500, 2000] if not a.quick else [1, 20, 100]
+    xg = exp_crossgraph(graphs, ["tree", "cluster"], cross_sizes, max(5, a.trials // 2) if not a.quick else 3,
+                        a.seed, methods, a.closure)
+    xg.to_csv(out("raw_crossgraph.csv"), index=False)
+    xsum = pd.concat([summarise(d).assign(graph=name) for name, d in xg.groupby("graph", sort=False)],
+                     ignore_index=True)
+    xsum.to_csv(out("summary_crossgraph.csv"), index=False)
+    gstats = pd.DataFrame([graph_stats(gg, name, "synthetic" if name == "synthetic" else "OpenStreetMap")
+                           for name, gg in graphs])
+    gstats.to_csv(out("graph_stats.csv"), index=False)
     gc.enable()
 
-    print("[8/8] figures", flush=True)
+    print("[9/9] figures", flush=True)
     plots.fig_speedup(summ, out("fig1_speedup_vs_size.png"), g.n, modes, methods)
     plots.fig_runtime(summ, out("fig2_runtime_vs_size.png"), modes, methods)
     plots.fig_affected(summ, out("fig3_affected_fraction.png"), g.n, modes)
@@ -598,9 +660,13 @@ def main():
     plots.fig_heatmap(g, s, case, out("fig6_heatmap.png"))
     plots.fig_fleet(fl, out("fig7_fleet.png"))
     plots.fig_p2p(pp, out("fig8_point_to_point.png"), P2P_METHODS)
+    plots.fig_cross_graph(xsum, out("fig9_cross_graph.png"), [nm for nm, _ in graphs], methods)
 
     big = mk[mk["affected"] >= 50]
-    meta = dict(graph_source=source, n=g.n, m=m, depot=s, seed=a.seed, trials=a.trials,
+    sha, dirty = git_commit()
+    meta = dict(git_commit=sha, git_dirty=dirty,
+                command="python " + " ".join([os.path.relpath(sys.argv[0], ROOT)] + sys.argv[1:]),
+                args=vars(a), graph_source=source, n=g.n, m=m, depot=s, seed=a.seed, trials=a.trials,
                 sizes=sizes, modes=modes, methods=methods, closure=a.closure,
                 block_factor=BLOCK_FACTOR, fleet_size=a.fleet_size,
                 timing=dict(min_total_s=MIN_TOTAL, min_reps=MIN_REPS, max_reps=MAX_REPS,
@@ -618,13 +684,16 @@ def main():
                            total_ms_arrays_big=1e3 * float(big["t_arrays"].sum())),
                 python=platform.python_version(), platform=platform.platform(),
                 runtime_seconds=round(time.time() - t0, 1),
+                crossgraph={name: {method: {mode: crossover(xsum[xsum["graph"] == name], mode, method)
+                                            for mode in ("tree", "cluster")} for method in methods}
+                            for name, _ in graphs},
                 heatmap_net_changed=case[0],
                 heatmap_stranded=sum(1 for b, c in zip(case[1], case[2]) if b < INF and c == INF),
                 ripple=dict(n=len(rp), max_affected=int(rp["affected"].max()),
                             median_affected=float(rp["affected"].median()),
                             frac_zero=float((rp["affected"] == 0).mean()),
                             median_subtree=float(rp["subtree"].median())))
-    with open(out("meta.json"), "w") as f:
+    with open(out("meta.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
     print(f"Done in {meta['runtime_seconds']} s; {N_CHECKS} repair==Dijkstra checks passed.")
     print(f"Results written to {os.path.abspath(a.out)}")

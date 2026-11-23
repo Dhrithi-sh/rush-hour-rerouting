@@ -1,19 +1,29 @@
 # Rush Hour Rerouting: How Fast Can a Map Heal Itself?
 
-Problem 11 – adaptive path-finding in dynamic weighted graphs.
-Compares **full Dijkstra recomputation** with **incremental shortest-path repair**
-(Ramalingam–Reps style) when roads are blocked, slowed down, or cleared.
+Problem 11: adaptive path-finding in dynamic weighted graphs.
+When roads are blocked, slowed down or cleared, how should a routing service update its
+shortest-path tree? We compare
 
-## 1. Setup (about 2 minutes)
+* **full Dijkstra recomputation**,
+* **per-edge incremental repair** (Ramalingam–Reps style, one edge change at a time),
+* **batch repair** (all changes of a disruption in one sweep; proof in the report), and
+* for a single destination, **A\*** from scratch and **LPA\*** (Lifelong Planning A*),
 
-Requires **Python 3.9+**.
+on a synthetic city and on real OpenStreetMap networks. Every repaired result is checked
+against a fresh Dijkstra, in the tests and inside every experiment.
+
+## 1. Setup
+
+Requires **Python 3.10+**.
 
 ```bash
-cd rush_hour_rerouting
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt    # also installs this repo as the `rush_hour` package
 ```
+
+Optional: `pip install -r requirements-osm.txt` (osmnx, to download real cities) and
+`pip install -r requirements-dev.txt` (ruff).
 
 ## 2. Run everything with one command
 
@@ -21,77 +31,112 @@ pip install -r requirements.txt
 python run_all.py
 ```
 
-This runs, in order: correctness tests → experiments (CSVs + 6 figures in `results/`)
-→ builds `report/Rush_Hour_Rerouting_Report.docx`.
+Runs, in order: tests (pytest + hypothesis) → experiments (CSVs + figures in `results/`) →
+`report/Rush_Hour_Rerouting_Report.docx`. `run_all.py` prints its own wall time at the end.
 
-| Command | What it does | Time |
+| Command | What it does | Time (measured) |
 |---|---|---|
-| `python run_all.py --quick` | small graph, few trials (smoke test) | ~20 s (measured 17 s) |
-| `python run_all.py` | full run on the synthetic city (~20k nodes, 15 trials) | ~2 min |
-| `python run_all.py --place "Piedmont, California, USA"` | **real OpenStreetMap city** | depends on city |
+| `python run_all.py --quick` | small graph, few trials (smoke test, same as CI) | ~45 s |
+| `python run_all.py` | full run: 140×140 synthetic city, 15 trials, plus every cached real city | see `results/meta.json` → `runtime_seconds` |
 
-The shipped results/report used `python run_all.py --trials 30` (~3 min).
-Useful extra flags (forwarded to the experiment script): `--trials 30`, `--seed 1`,
-`--sizes 1 5 20 100 500`, `--width 100 --height 100` (synthetic city size).
+### Flags (forwarded to `experiments/run_experiments.py`)
 
-### Using a real city (recommended for the final report)
+| Flag | Meaning |
+|---|---|
+| `--quick` | small graph and few trials |
+| `--trials N`, `--seed S`, `--sizes 1 5 20 ...` | experiment size / reproducibility |
+| `--width W --height H` | size of the synthetic city |
+| `--closure {factor,delete}` | blocked road = 50× travel time (default) or deleted (weight ∞) |
+| `--fleet-size K` | vehicles in the fleet-rerouting experiment (default 50) |
+| `--graph-file data/x.graphml` | use a cached real network as the main graph (offline) |
+| `--place "City, Country"` | download (once) and use a real network as the main graph |
+| `--compare-graphs a.graphml b.graphml` | networks for the cross-graph comparison (default: every `data/*.graphml`; give no files to skip) |
+| `--out DIR` | results folder (also used by the report builder) |
+| `--report FILE.docx` | (run_all only) where to write the report |
+
+### Real cities
+
 ```bash
-pip install osmnx
-python run_all.py --place "Piedmont, California, USA"
+pip install -r requirements-osm.txt
+python scripts/fetch_cities.py           # Salt Lake City (USA, grid) and Bologna (Italy, irregular)
+python run_all.py                        # picks up every data/*.graphml automatically
 ```
-The street network is downloaded once and cached in `data/`. Start with a small city or
-neighbourhood (5k–50k nodes); very large cities make the pure-Python experiment slow.
-The report is regenerated automatically with the real-map numbers, and the “synthetic data”
-note disappears.
+
+Downloads are cached in `data/` (not committed; they are 5–10 MB each). Cached files are read with
+plain networkx if osmnx is not installed. The loader supports osmnx 1.x and 2.x. If no real network is
+cached, the report's real-city section says so instead of showing numbers.
 
 ## 3. Run the pieces separately
 
 ```bash
-python tests/test_correctness.py                         # repair == Dijkstra on random graphs
-python experiments/run_experiments.py [--place ...]      # experiments + figures
-python report/build_report.py                            # rebuild the Word report (+PDF if LibreOffice is installed)
+python -m pytest                                    # all tests
+python experiments/run_experiments.py [flags]      # experiments + figures
+python report/build_report.py [--results DIR]      # rebuild the report (+PDF if LibreOffice is installed)
+ruff check .                                        # lint
 ```
 
-## 4. Project layout
+## 4. What the experiments measure
+
+| Output | Content |
+|---|---|
+| `raw_main.csv`, `summary_main.csv`, fig1–3 | speed-up vs disruption size for 4 disruption models (scattered closures, accident zone, congestion wave, shortest-path-tree closures), per-edge vs batch repair, **all vs effective (non-no-op) updates**, medians + IQR |
+| `raw_scaling.csv`, fig4 | scaling with the number of nodes |
+| `raw_ripple.csv`, fig5 | ripple size vs shortest-path-tree subtree size, by road class |
+| fig6 | one accident: which nodes are rerouted and by how much |
+| `raw_fleet.csv`, fig7 | fleet of K vehicles: routes changed, delay, stranded vehicles |
+| `raw_p2p.csv`, fig8 | single-destination rerouting: Dijkstra, early-exit Dijkstra, A*, batch repair, LPA* |
+| `raw_closure.csv` | ×50 closure vs true deletion on identical disruptions |
+| `raw_marks.csv` | micro-benchmark: Python `set()` vs generation-stamped arrays |
+| `raw_crossgraph.csv`, `summary_crossgraph.csv`, `graph_stats.csv`, fig9 | synthetic vs real networks |
+| `meta.json` | all parameters, break-even points, git commit, exact command line |
+
+Timing: every repair is repeated until it has run ≥ 2 ms (3–50 runs) and the median is used;
+graph, distances and parents are restored exactly between repeats. The key results are summarised
+in the report's abstract and conclusion, which are generated from these files.
+
+## 5. Project layout
 
 ```
-src/graph.py          graph container, synthetic city generator, OSMnx loader
-src/sssp.py           Dijkstra + DynamicSSSP (decrease / increase repair)
-src/disruptions.py    scattered closures, accident zone, congestion wave
-tests/                randomised correctness tests
-experiments/          benchmark + figure generation
-report/               build_report.py  ->  Rush_Hour_Rerouting_Report.docx / .pdf
-results/              CSVs, meta.json, fig1..fig6 (generated)
-run_all.py            one-command pipeline
+src/rush_hour/graph.py        graph container (INF weight = deleted road), synthetic city, networkx conversion
+src/rush_hour/sssp.py         Dijkstra, DynamicSSSP: per-edge + batch repair, parent tree, path_to
+src/rush_hour/lpa.py          A*, early-exit Dijkstra, LPA*, consistent straight-line heuristic
+src/rush_hour/disruptions.py  closure / accident / congestion / tree-edge generators, closure models
+src/rush_hour/osm.py          OpenStreetMap download + cached .graphml loading (osmnx 1.x and 2.x)
+src/rush_hour/stats.py        graph statistics (degree, hop diameter, one-way fraction)
+experiments/                  run_experiments.py (all experiments) + plots.py (figures)
+report/build_report.py        results/ -> Rush_Hour_Rerouting_Report.docx
+scripts/fetch_cities.py       download + cache the real networks
+tests/                        unit tests, LPA* tests, hypothesis property tests
+results/                      CSVs, figures, meta.json (generated)
+run_all.py                    one-command pipeline
+.github/workflows/ci.yml      lint + tests + quick pipeline on latest and minimum dependency versions
 ```
 
-## 5. Using the algorithm in your own code
+## 6. Using the algorithms in your own code
 
 ```python
-from graph import make_synthetic_city
-from sssp import DynamicSSSP
+from rush_hour.graph import INF, make_synthetic_city
+from rush_hour.sssp import DynamicSSSP
 
 g = make_synthetic_city(60, 60, seed=0)
-dyn = DynamicSSSP(g, s=0)               # runs Dijkstra once
+dyn = DynamicSSSP(g, s=0)                  # runs Dijkstra once
 u, v, w = g.edges()[10]
-changed = dyn.update_edge(u, v, w * 50) # block a road; returns #nodes whose distance changed
-print(changed, dyn.dist[100])
-dyn.update_edge(u, v, w)                # clear it again
+dyn.update_edge(u, v, INF)                 # close a road; returns #nodes whose distance changed
+print(dyn.path_to(100), dyn.dist[100])     # new route and travel time (deciseconds)
+dyn.update_edges([(u, v, w)])              # batch API: re-open it (any number of changes)
 ```
-Weights must be **positive integers** (the loaders store travel time in deciseconds).
 
-## 6. Before you submit
+Weights are **positive integers** (travel time in deciseconds); `INF` deletes an edge.
 
-* Fill in the team names on the title page and in Appendix A of the report.
-* Re-run on a real city (`--place ...`) so the report is based on real data.
+## 7. Before you submit
+
+* Fill in the team names, course and date on the title page and in Appendix A of the report.
 * Check the reference list against the original papers.
-* Skim the report text: the numbers are filled in automatically, but you should be able to explain
-  every proof step and figure in your own words.
+* The PDF is only produced if LibreOffice is installed; otherwise export the .docx to PDF manually.
+* You should be able to explain every proof step and figure in your own words.
 
 ## Notes and limitations
 
-* Everything is pure Python for readability; absolute times are slower than C++/Rust, but the
-  ratios and trends are what the study is about.
-* A road “closure” is modelled as 50× travel time (finite weight), not an edge deletion.
-* The OSMnx loader was written against the documented OSMnx API; the conversion code is unit-tested
-  with a mock graph, but the download step needs your internet connection and `osmnx` installed.
+* Pure Python for readability; absolute times are slower than C++/Rust, and break-even sizes
+  would move in compiled code. The report has a full "threats to validity" section.
+* Single source (one depot); the disruption models are random, not calibrated on real incident data.

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rush-hour-rerouting"
+version = "1.0.0"
+description = "Incremental and batch shortest-path repair vs. Dijkstra on road networks (Problem 11)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+    "networkx>=3.0",
+    "python-docx>=1.1",
+]
+
+[project.optional-dependencies]
+osm = ["osmnx>=1.6"]
+test = ["pytest>=7.4", "hypothesis>=6.80"]
+dev = ["pytest>=7.4", "hypothesis>=6.80", "ruff>=0.4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+extend-exclude = [".venv", "data", "results"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+# E702/E701: the plotting code puts several short matplotlib calls on one line.
+ignore = ["E701", "E702", "B023", "B905"]
+
+[tool.ruff.lint.per-file-ignores]
+"report/build_report.py" = ["E501"]

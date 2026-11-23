@@ -1,7 +1,11 @@
+# Everything needed to run the tests, the experiments and the report builder.
 numpy>=1.24
 pandas>=2.0
 matplotlib>=3.7
 networkx>=3.0
 python-docx>=1.1
-# Optional, only for real cities (--place):
-# osmnx>=1.6
+pytest>=7.4
+hypothesis>=6.80
+# Installs the rush_hour package itself (src/rush_hour) in editable mode:
+-e .
+# Optional extras live in requirements-osm.txt (real cities) and requirements-dev.txt (ruff).

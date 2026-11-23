@@ -10,12 +10,15 @@ Invariant after every public call (checked by `check_tree` in the tests and the
 experiments): dist equals a from-scratch Dijkstra, and every parent edge
 (parent[x], x) exists and is tight, i.e. dist[parent[x]] + w = dist[x].
 """
+from __future__ import annotations
+
 import heapq
+from collections.abc import Iterable
 
-from graph import INF
+from .graph import INF, Graph
 
 
-def dijkstra(g, s):
+def dijkstra(g: Graph, s: int) -> list[float]:
     """Single-source shortest distances, O((m + n) log n) with a binary heap.
     Used as the test oracle (kept deliberately minimal)."""
     dist = [INF] * g.n
@@ -35,7 +38,7 @@ def dijkstra(g, s):
     return dist
 
 
-def dijkstra_tree(g, s):
+def dijkstra_tree(g: Graph, s: int) -> tuple[list[float], list[int]]:
     """Dijkstra returning (dist, parent): the full-recomputation baseline."""
     dist = [INF] * g.n
     parent = [-1] * g.n
@@ -56,7 +59,7 @@ def dijkstra_tree(g, s):
     return dist, parent
 
 
-def check_tree(g, s, dist, parent):
+def check_tree(g: Graph, s: int, dist: list[float], parent: list[int]) -> None:
     """Raise AssertionError unless `parent` is a valid shortest-path tree for `dist`."""
     assert parent[s] == -1 and dist[s] == 0
     for x in range(g.n):
@@ -79,7 +82,7 @@ class DynamicSSSP:
     INF closes (deletes) the road; a finite weight on a missing edge (re)opens it.
     """
 
-    def __init__(self, g, s):
+    def __init__(self, g: Graph, s: int) -> None:
         self.g, self.s = g, s
         self.dist, self.parent = dijkstra_tree(g, s)
         # Generation-stamped marks instead of per-call set() objects: node x is in
@@ -89,11 +92,12 @@ class DynamicSSSP:
         self._queued = [0] * g.n
         self._gen = 0
 
-    def recompute(self):
+    def recompute(self) -> list[float]:
+        """Throw the state away and rerun Dijkstra."""
         self.dist, self.parent = dijkstra_tree(self.g, self.s)
         return self.dist
 
-    def path_to(self, t):
+    def path_to(self, t: int) -> list[int]:
         """Current shortest path s -> t as a list of nodes ([] if t is unreachable)."""
         if self.dist[t] == INF:
             return []
@@ -105,15 +109,18 @@ class DynamicSSSP:
         path.reverse()
         return path
 
-    def snapshot(self):
+    def snapshot(self) -> tuple[list[float], list[int]]:
+        """Copy of (dist, parent), for restore()."""
         return list(self.dist), list(self.parent)
 
-    def restore(self, snap):
+    def restore(self, snap: tuple[list[float], list[int]]) -> None:
+        """Restore (dist, parent) in place (the graph must be restored separately)."""
         self.dist[:] = snap[0]
         self.parent[:] = snap[1]
 
     # ================================================================ per edge
-    def update_edge(self, u, v, new_w):
+    def update_edge(self, u: int, v: int, new_w: float) -> int:
+        """Change one weight (INF deletes) and repair; returns |delta|."""
         g = self.g
         old = g.out[u].get(v, INF)
         if new_w == old:
@@ -230,7 +237,7 @@ class DynamicSSSP:
                         push(heap, (c, z))
 
     # ================================================================ batch
-    def update_edges(self, changes):
+    def update_edges(self, changes: Iterable[tuple[int, int, float]]) -> int:
         """Apply a batch of weight changes [(u, v, new_w), ...] and repair once.
 
         1. Apply all increases. Phase 1 (`_affected`) from every head of an

@@ -5,8 +5,11 @@ weights make the "tight edge" test  dist[u] + w == dist[v]  exact (no float
 round-off) and positivity is required by the repair algorithm's correctness
 proof (see report, Section 3).
 """
+from __future__ import annotations
+
 import math
 import random
+from typing import Any
 
 INF = float("inf")
 
@@ -14,7 +17,7 @@ INF = float("inf")
 class Graph:
     """Simple directed graph with adjacency dicts in both directions."""
 
-    def __init__(self, n):
+    def __init__(self, n: int) -> None:
         self.n = n
         self.out = [dict() for _ in range(n)]   # out[u][v] = w
         self.inn = [dict() for _ in range(n)]   # inn[v][u] = w
@@ -22,7 +25,8 @@ class Graph:
         self.edge_class = {}                    # (u,v) -> 'local'|'arterial'|'bridge'
 
     # -- construction -------------------------------------------------
-    def add_edge(self, u, v, w, cls="local"):
+    def add_edge(self, u: int, v: int, w: float, cls: str = "local") -> None:
+        """Add edge (u, v); keeps the cheaper of two parallel edges, ignores self-loops."""
         if u == v:
             return
         w = int(w)
@@ -35,7 +39,7 @@ class Graph:
         self.inn[v][u] = w
         self.edge_class[(u, v)] = cls
 
-    def set_weight(self, u, v, w):
+    def set_weight(self, u: int, v: int, w: float) -> None:
         """Set the weight of edge (u, v). w = INF closes the road (the edge is
         removed); a finite w on a missing edge (re)opens it."""
         if w == INF:
@@ -48,18 +52,21 @@ class Graph:
         self.inn[v][u] = w
 
     # -- queries ------------------------------------------------------
-    def weight(self, u, v):
+    def weight(self, u: int, v: int) -> float:
         """Current weight of (u, v); INF if the edge does not exist (closed)."""
         return self.out[u].get(v, INF)
 
-    def edges(self):
+    def edges(self) -> list[tuple[int, int, int]]:
+        """All edges as (u, v, w)."""
         return [(u, v, w) for u in range(self.n) for v, w in self.out[u].items()]
 
     @property
-    def m(self):
+    def m(self) -> int:
+        """Number of directed edges."""
         return sum(len(d) for d in self.out)
 
-    def copy(self):
+    def copy(self) -> Graph:
+        """Independent deep copy (adjacency, coordinates, road classes)."""
         g = Graph(self.n)
         g.out = [dict(d) for d in self.out]
         g.inn = [dict(d) for d in self.inn]
@@ -89,8 +96,9 @@ def _largest_scc_graph(n, edge_list, xy):
 # ---------------------------------------------------------------------
 # Synthetic city (offline fallback; same data structure as a real OSM graph)
 # ---------------------------------------------------------------------
-def make_synthetic_city(width=140, height=140, seed=0, remove_frac=0.08,
-                        oneway_frac=0.12, arterial_every=12, n_bridges=4):
+def make_synthetic_city(width: int = 140, height: int = 140, seed: int = 0, remove_frac: float = 0.08,
+                        oneway_frac: float = 0.12, arterial_every: int = 12,
+                        n_bridges: int = 4) -> Graph:
     """Perturbed street grid with arterial roads, one-way streets and a 'river'
     that can only be crossed at a few bridges (so topology matters)."""
     rng = random.Random(seed)
@@ -159,7 +167,7 @@ def _first(value):
     return value
 
 
-def from_networkx(G, weight="travel_time", scale=10, lonlat=False):
+def from_networkx(G: Any, weight: str = "travel_time", scale: float = 10, lonlat: bool = False) -> Graph:
     """Convert an OSMnx / networkx (Multi)DiGraph into our Graph.
 
     `weight` is travel time in seconds (default speed 50 km/h if missing), stored
@@ -186,7 +194,7 @@ def from_networkx(G, weight="travel_time", scale=10, lonlat=False):
     return _largest_scc_graph(len(nodes), edge_list, xy)
 
 
-def load_osm(place, cache_dir="data"):
+def load_osm(place: str, cache_dir: str = "data") -> Graph:
     """Backward-compatible alias for osm.load_osm (download or load cached city)."""
-    from osm import load_osm as _load
+    from .osm import load_osm as _load
     return _load(place, cache_dir)

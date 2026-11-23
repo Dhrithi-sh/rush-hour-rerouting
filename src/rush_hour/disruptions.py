@@ -7,10 +7,15 @@ Two closure models are supported:
     unreachable from the source.
 Congestion waves only slow roads down and never delete them.
 """
+from __future__ import annotations
+
 import math
+import random
 from collections import deque
 
-from graph import INF
+from .graph import INF, Graph
+
+Disruption = list[tuple[int, int, float, float]]   # (u, v, old_w, new_w)
 
 BLOCK_FACTOR = 50     # blocked road ("factor" model): 50x travel time
 WAVE_PEAK = 10        # congestion multiplier at the epicentre
@@ -18,7 +23,7 @@ WAVE_DECAY = 2.0      # hops over which congestion decays by 1/e
 CLOSURES = ("factor", "delete")
 
 
-def blocked(w, closure="factor"):
+def blocked(w: float, closure: str = "factor") -> float:
     """New weight of a road with weight w after it is blocked."""
     if closure == "delete":
         return INF
@@ -45,20 +50,26 @@ def _bfs_edges(g, center, k):
     return found[:k]
 
 
-def single_block(g, rng, k=1, closure="factor"):
+def single_block(g: Graph, rng: random.Random, k: int = 1, closure: str = "factor") -> Disruption:
     """k independent random road closures scattered over the city."""
     edges = rng.sample(g.edges(), k)
     return [(u, v, w, blocked(w, closure)) for u, v, w in edges]
 
 
-def cluster_block(g, rng, k, closure="factor"):
+def cluster_block(g: Graph, rng: random.Random, k: int, closure: str = "factor") -> Disruption:
     """Accident zone: k connected edges around a random point are all blocked."""
     center = rng.randrange(g.n)
     return [(u, v, g.out[u][v], blocked(g.out[u][v], closure))
             for (u, v), _ in _bfs_edges(g, center, k)]
 
 
-def congestion_wave(g, rng, k, closure="factor"):
+def cluster_at(g: Graph, centre: int, k: int, closure: str = "factor") -> Disruption:
+    """Accident zone of k connected edges around a given node `centre`."""
+    return [(u, v, g.out[u][v], blocked(g.out[u][v], closure))
+            for (u, v), _ in _bfs_edges(g, centre, k)]
+
+
+def congestion_wave(g: Graph, rng: random.Random, k: int, closure: str = "factor") -> Disruption:
     """Congestion spreading from an epicentre: weight multiplier decays with hop
     distance. (`closure` is accepted for a uniform signature but unused.)"""
     center = rng.randrange(g.n)
@@ -70,7 +81,8 @@ def congestion_wave(g, rng, k, closure="factor"):
     return res
 
 
-def tree_block(g, rng, k, parent, closure="factor"):
+def tree_block(g: Graph, rng: random.Random, k: int, parent: list[int],
+               closure: str = "factor") -> Disruption:
     """k closures on random edges of the current shortest-path tree `parent`
     (worst-case-relevant: every blocked road carries a shortest path)."""
     heads = [x for x in range(g.n) if parent[x] >= 0]
@@ -83,7 +95,8 @@ MODES = {"single": single_block, "cluster": cluster_block, "wave": congestion_wa
 TREE_MODES = {"tree"}   # generators that also need the current shortest-path tree
 
 
-def generate(mode, g, rng, k, parent=None, closure="factor"):
+def generate(mode: str, g: Graph, rng: random.Random, k: int, parent: list[int] | None = None,
+             closure: str = "factor") -> Disruption:
     """Uniform entry point: a disruption of `mode` with k edges."""
     if mode in TREE_MODES:
         return MODES[mode](g, rng, k, parent, closure)

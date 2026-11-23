@@ -8,10 +8,13 @@ all known locations, so both major versions work.
 A cached .graphml can also be read **without osmnx** (plain networkx), so
 `--graph-file` works offline on a machine that only has requirements.txt.
 """
+from __future__ import annotations
+
 import os
 import re
+from typing import Any
 
-from graph import from_networkx
+from .graph import Graph, from_networkx
 
 
 def _ox(name):
@@ -25,11 +28,12 @@ def _ox(name):
     raise AttributeError(f"osmnx {getattr(ox, '__version__', '?')} has no function {name!r}")
 
 
-def slug(place):
+def slug(place: str) -> str:
+    """File-name-safe version of a place name."""
     return re.sub(r"[^a-z0-9]+", "_", place.lower()).strip("_")
 
 
-def download(place, path):
+def download(place: str, path: str) -> Any:
     """Download the drivable network of `place`, add speeds and travel times, and
     save it as .graphml at `path`. Returns the networkx MultiDiGraph."""
     G = _ox("graph_from_place")(place, network_type="drive")
@@ -40,7 +44,7 @@ def download(place, path):
     return G
 
 
-def read_graphml(path):
+def read_graphml(path: str) -> Any:
     """Read a cached .graphml into a networkx graph, with osmnx if installed
     (typed attributes) and plain networkx otherwise (string attributes, which
     `from_networkx` converts)."""
@@ -51,12 +55,12 @@ def read_graphml(path):
         return nx.read_graphml(path)
 
 
-def load_graph_file(path):
+def load_graph_file(path: str) -> Graph:
     """Our Graph (largest SCC, deciseconds, local metric coordinates) from a .graphml."""
     return from_networkx(read_graphml(path), lonlat=True)
 
 
-def load_osm(place, cache_dir="data"):
+def load_osm(place: str, cache_dir: str = "data") -> Graph:
     """Download (or load the cached copy of) the drivable street network of a place."""
     path = os.path.join(cache_dir, slug(place) + ".graphml")
     if not os.path.exists(path):
