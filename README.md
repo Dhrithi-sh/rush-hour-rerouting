@@ -135,8 +135,8 @@ Weights are **positive integers** (travel time in deciseconds); `INF` deletes an
 
 ## 7. Before you submit
 
-* Team: Dhrithi Shashibushan, Avishi Singh, Kritika Singh, Pankhuri Singhal. Their roles in the report
-  come from the `TEAM` list at the top of `report/build_report.py`; fix the order there if needed.
+* Team members: Dhrithi Shashibushan, Avishi Singh, Kritika Singh, Pankhuri Singhal (the report reads
+  them from the `TEAM` list at the top of `report/build_report.py`).
 * Fill in the course and date on the title page of the report.
 * Check the reference list against the original papers.
 * The PDF is only produced if LibreOffice is installed; otherwise export the .docx to PDF manually.
